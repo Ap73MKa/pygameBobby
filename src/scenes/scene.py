@@ -34,9 +34,9 @@ class Scene:
         self.carrots_sprites = Group()
         self.trigger_group = Group()
 
-        self.on_init()
+        self.on_load()
 
-    def on_init(self):
+    def on_load(self):
         self.tmx_data = load_pygame(PathManager.get(f'assets/maps/map{self.index_map}.tmx'))
         self.corner = Vector2(self.tmx_data.width * Config.TITLE_SIZE, self.tmx_data.height * Config.TITLE_SIZE)
         self.carrots_count = self.found_carrots = 0
@@ -46,10 +46,10 @@ class Scene:
         self.trap_sprites.empty()
         self.ui.set_start_time(pygame.time.get_ticks())
         self.player = None
-        self.unpack_map()
+        self.load_map()
         self.player = Player(self.start_pos, self.visible_sprites, self.collision_sprites)
 
-    def unpack_map(self):
+    def load_map(self):
         for layer in self.tmx_data.visible_layers:
             if not hasattr(layer, 'data'):
                 break
@@ -93,19 +93,18 @@ class Scene:
             if sprite.rect.collidepoint(self.player.pos.x, self.player.pos.y):
                 if self.carrots_count == self.found_carrots:
                     self.index_map += 1
-                    self.on_init()
+                    self.on_load()
 
-        for sprite in self.carrots_sprites:
-            if sprite.rect.x == self.player.pos.x and sprite.rect.y == self.player.pos.y:
-                self.found_carrots += 1
-                sprite.kill()
+        for carrot in list(filter(lambda sprite: sprite.rect.topleft == self.player.pos, self.carrots_sprites)):
+            self.found_carrots += 1
+            carrot.kill()
 
         for sprite in self.trap_sprites:
             sprite: Trap
             if sprite.rect.x == self.player.pos.x and sprite.rect.y == self.player.pos.y:
                 sprite.touched = True
                 if sprite.activate:
-                    self.on_init()
+                    self.on_load()
             elif sprite.touched:
                 if not sprite.activate:
                     sprite.activate_trap()
