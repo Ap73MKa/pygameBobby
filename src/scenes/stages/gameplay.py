@@ -1,7 +1,7 @@
 import pygame.time
+import pygame as pg
 from pygame import Surface, Vector2
 from pygame.display import get_surface
-from pygame.image import load
 from pygame.sprite import Group
 from pytmx import TiledMap
 from pytmx.util_pygame import load_pygame
@@ -12,18 +12,21 @@ from src.objects.player import Player
 from src.objects.trap import Trap
 from src.scenes.camera import CameraGroup
 from src.objects.tile import Tile
+from src.scenes.stages.stage_utils import GameStage
 from src.scenes.ui import UI
+from src.scenes.stages.base import BaseState
 
 
-class Scene:
+class Gameplay(BaseState):
     def __init__(self):
+        super().__init__()
         self.player: Player | None = None
         self.tmx_data: TiledMap | None = None
         self.carrots_count = self.found_carrots = 0
         self.start_pos = (0, 0)
         self.index_map = 1
-        self.hole = load(PathManager.get('assets/graphics/objects/carrot_hole.png')).convert_alpha()
         self.corner = Vector2(Config.WIDTH, Config.HEIGHT)
+        self.next_state = GameStage.PAUSE
         self.ui = UI()
 
         # Groups
@@ -108,6 +111,9 @@ class Scene:
             elif sprite.touched:
                 if not sprite.activate:
                     sprite.activate_trap()
+
+    def get_event(self, event):
+        self.done = event.type == pg.KEYUP and event.key == pg.K_ESCAPE
 
     def update(self, delta: float):
         self.check_collide()

@@ -1,7 +1,10 @@
 import pygame as pg
 
 from misc.config import Config
-from src.scenes.scene import Scene
+from src.scenes.stages.menu import Menu
+from src.scenes.stages.gameplay import Gameplay
+from src.scenes.stages.pause import Pause
+from src.scenes.stages.stage_utils import GameStage
 
 
 class Game:
@@ -10,7 +13,16 @@ class Game:
         self.size = self.width, self.height = Config.WIDTH, Config.HEIGHT
         self.screen = self.on_init()
         self.clock = pg.time.Clock()
-        self.scene = Scene()
+        self.stages = {
+            GameStage.MENU: Menu(),
+            GameStage.GAMEPLAY: Gameplay(),
+            GameStage.PAUSE: Pause()}
+        self.stage = self.stages[GameStage.MENU]
+
+    def flip_state(self):
+        self.stage.done = False
+        self.stage = self.stages[self.stage.next_state]
+        self.stage.startup(self.stage.persist)
 
     def on_init(self):
         pg.init()
@@ -20,12 +32,17 @@ class Game:
     def on_event(self):
         for event in pg.event.get():
             self._running = not event.type == pg.QUIT
+            self.stage.get_event(event)
 
     def on_update(self, delta):
-        self.scene.update(delta)
+        if self.stage.quit:
+            self._running = False
+        elif self.stage.done:
+            self.flip_state()
+        self.stage.update(delta)
 
     def on_render(self):
-        self.scene.render()
+        self.stage.render()
         pg.display.update()
 
     def on_execute(self) -> None:
