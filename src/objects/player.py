@@ -2,17 +2,21 @@ import pygame.sprite
 from src.misc.config import Config
 from src.misc.path import PathManager
 
+from pygame.transform import scale
+
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos, group: pygame.sprite.Group):
         super().__init__(group)
-        self.image = pygame.image.load(PathManager.get('assets/graphics/player/idle.png'))
-        self.image = pygame.transform.scale2x(self.image)
+        # self.image = pygame.image.load(PathManager.get('assets/graphics/player/idle.png'))
+        # self.image = scale(self.image, (self.image.get_size()[0] * 2, self.image.get_size()[1] * 2))
+        self.image = pygame.Surface((Config.TITLE_SIZE, Config.TITLE_SIZE))
+        self.image.fill('red')
         self.rect = self.image.get_rect(center=pos)
         self.direction = pygame.math.Vector2()
         self.pos = pygame.math.Vector2(self.rect.center)
         self.target_pos = pygame.math.Vector2(self.rect.center)
-        self.speed = 5
+        self.speed = 3
         self.dx = self.dy = 0
 
     def input(self):
@@ -25,10 +29,10 @@ class Player(pygame.sprite.Sprite):
         else:
             self.direction.y = 0
 
-        if keys[pygame.K_RIGHT]:
-            self.direction.x = 1
-        elif keys[pygame.K_LEFT]:
+        if keys[pygame.K_LEFT]:
             self.direction.x = -1
+        elif keys[pygame.K_RIGHT]:
+            self.direction.x = 1
         else:
             self.direction.x = 0
 
@@ -36,7 +40,7 @@ class Player(pygame.sprite.Sprite):
         return abs(self.pos.x - self.target_pos.x) <= 2 and abs(self.pos.y - self.target_pos.y) <= 2
 
     def set_target_pos(self):
-        if self.is_target_pos():
+        if self.is_target_pos() and self.dx == self.dy == 0:
             if (self.direction.x != 0) != (self.direction.y != 0):
                 self.target_pos += self.direction * Config.TITLE_SIZE
 

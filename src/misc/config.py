@@ -3,7 +3,7 @@ from typing import Final
 
 
 class Config(ABC):
-    WIDTH: Final = 800
-    HEIGHT: Final = 600
-    FPS: Final = 32
+    FPS: Final = 60
     TITLE_SIZE: Final = 32
+    WIDTH: Final = TITLE_SIZE * 17
+    HEIGHT: Final = TITLE_SIZE * 12
