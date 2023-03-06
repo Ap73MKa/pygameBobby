@@ -1,6 +1,7 @@
 from pygame import Surface
 
 from .gameplay import Gameplay
+from .level_transition import LevelTransition
 from .menu import Menu
 from .pause import Pause
 from .state import GameState
@@ -12,6 +13,7 @@ class StateManager:
             GameState.MENU: Menu(),
             GameState.GAMEPLAY: Gameplay(),
             GameState.PAUSE: Pause(),
+            GameState.TRANSITION: LevelTransition(),
         }
         self._running = True
         self.state = self.stages[GameState.MENU]

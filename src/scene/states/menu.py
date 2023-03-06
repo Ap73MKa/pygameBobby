@@ -55,10 +55,10 @@ class Menu(State):
 
     def handle_action(self) -> None:
         if self.active_index == 0:
-            self.persist = {"level": 1}
+            self.persist = {"level": 1, "reload": True}
             self.done = True
         if self.active_index == 1:
-            self.persist = {"level": self.level_index}
+            self.persist = {"level": self.level_index, "reload": True}
             self.done = True
         elif self.active_index == 3:
             self.quit = True

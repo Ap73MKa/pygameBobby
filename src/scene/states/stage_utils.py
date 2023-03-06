@@ -5,3 +5,4 @@ class GameState(IntEnum):
     MENU = auto()
     GAMEPLAY = auto()
     PAUSE = auto()
+    TRANSITION = auto()

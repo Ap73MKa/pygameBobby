@@ -22,7 +22,7 @@ class Gameplay(State):
         self.start_pos = (0, 0)
         self.index_map = 1
         self.corner = Vector2(Config.WIDTH, Config.HEIGHT)
-        self.next_state = GameState.PAUSE
+        self.next_state = GameState.TRANSITION
         self.is_player_died = False
         self.die_time = get_ticks()
 
@@ -35,11 +35,20 @@ class Gameplay(State):
         self.traps_group = Group()
         self.ui = UI()
 
+        self.on_load()
+
     def startup(self, persistent: dict) -> None:
+        self.next_state = GameState.TRANSITION
+        index = self.index_map
+        reload = False
         for key, item in persistent.items():
             if key == "level":
-                self.index_map = item
-        self.on_load()
+                index = item
+            if key == "reload":
+                reload = item
+        if self.index_map != index or reload:
+            self.index_map = index
+            self.on_load()
 
     def on_load(self) -> None:
         # Reset
@@ -116,11 +125,12 @@ class Gameplay(State):
             level_trigger.rect.topleft == self.player.pos
             and self.carrots_count == self.found_carrots
         ):
-            if self.index_map >= Config.MAX_LEVEL:
-                self.done = True
-                return
-            self.index_map += 1
-            self.on_load()
+            self.persist = {
+                "level": self.index_map + 1,
+                "time": self.ui.timer_text,
+                "steps": self.player.get_step_count(),
+            }
+            self.done = True
 
         for carrot in self.carrots_group:
             if carrot.rect.topleft == self.player.pos and not carrot.activated:

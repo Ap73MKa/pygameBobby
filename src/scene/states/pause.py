@@ -1,6 +1,6 @@
 import pygame as pg
 
-from pygame import Color, Surface, SurfaceType, Rect
+from pygame import Color, Surface, SurfaceType, Rect, draw
 from pygame.font import Font
 from pygame.image import load
 
@@ -16,17 +16,26 @@ class Pause(State):
         self.font = Font(PathManager.get("assets/graphics/hud/font.ttf"), 10)
         self.center = (Config.WIDTH // 2, Config.HEIGHT // 2)
         self.active_index = 0
-        self.options = ["Continue", "Back to menu", "Exit"]
+        self.options = ["Continue", "Reload level", "Back to menu", "Exit"]
+        self.is_drawn_once = False
         self.persist = {}
+
+    def startup(self, persistent: dict) -> None:
+        self.active_index = 0
+        self.is_drawn_once = False
 
     def handle_action(self) -> None:
         if self.active_index == 0:
             self.next_state = GameState.GAMEPLAY
             self.done = True
         if self.active_index == 1:
+            self.next_state = GameState.GAMEPLAY
+            self.persist = {"reload": True}
+            self.done = True
+        if self.active_index == 2:
             self.next_state = GameState.MENU
             self.done = True
-        elif self.active_index == 2:
+        elif self.active_index == 3:
             self.quit = True
 
     def handle_option_index(self, move: int = 0):
@@ -61,16 +70,12 @@ class Pause(State):
         return text.get_rect(center=center)
 
     def render(self, game_screen: Surface) -> None:
-        # Background
-        for x in range(Config.WIDTH // Config.TITLE_SIZE):
-            for y in range(Config.HEIGHT // Config.TITLE_SIZE):
-                game_screen.blit(
-                    self.bg_tile, (x * Config.TITLE_SIZE, y * Config.TITLE_SIZE)
-                )
-        dark = Surface((Config.WIDTH, Config.HEIGHT))
-        dark.fill((0, 0, 0))
-        dark.set_alpha(100)
-        game_screen.blit(dark, (0, 0))
+        if not self.is_drawn_once:
+            self.is_drawn_once = True
+            dark = Surface((Config.WIDTH, Config.HEIGHT))
+            dark.fill((0, 0, 0))
+            dark.set_alpha(100)
+            game_screen.blit(dark, (0, 0))
 
         # Options
         for index, _ in enumerate(self.options):

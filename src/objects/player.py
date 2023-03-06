@@ -47,6 +47,7 @@ class Player(Sprite):
         self.is_dying = False
         self.inactive_start = get_ticks()
         self.collision_group = collision_group
+        self.step_count = 0
 
     @staticmethod
     def import_animations():
@@ -86,7 +87,10 @@ class Player(Sprite):
         else:
             self.direction.x = 0
 
-        if (self.direction.x != 0) != (self.direction.y != 0):
+        if (self.direction.x != 0) != (
+            self.direction.y != 0
+        ) and self.direction != self.direction * 0:
+            self.step_count += 1
             self.target_pos += self.direction * Config.TITLE_SIZE
 
     def is_target_pos(self) -> bool:
@@ -94,6 +98,11 @@ class Player(Sprite):
             abs(self.pos.x - self.target_pos.x) <= 2
             and abs(self.pos.y - self.target_pos.y) <= 2
         )
+
+    def get_step_count(self):
+        step_count = self.step_count
+        self.step_count = 0
+        return step_count
 
     def move(self, delta: float):
         if self.dx != 0 or self.dy != 0:
@@ -123,8 +132,11 @@ class Player(Sprite):
             self.image = animation[self.frame]
             return
         if self.frame >= len(animation):
-            if self.anim_state in [AnimEnum.DYING, AnimEnum.FADING, AnimEnum.UNFADING]:
+            if self.anim_state in [AnimEnum.DYING, AnimEnum.FADING]:
                 self.frame = len(animation) - 1
+            elif self.anim_state == AnimEnum.UNFADING:
+                self.frame = 0
+                self.anim_state = AnimEnum.DOWN
             else:
                 self.frame = 0
         self.image = animation[int(self.frame)]
