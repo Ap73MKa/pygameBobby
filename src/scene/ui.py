@@ -6,7 +6,7 @@ from src.misc.path import PathManager
 
 
 class UI:
-    def __init__(self):
+    def __init__(self) -> None:
         self.display_surface = pygame.display.get_surface()
         self.start_time = pygame.time.get_ticks()
         self.font = pygame.font.Font(
@@ -24,18 +24,18 @@ class UI:
         self.elapsed_time = 0
         self.timer_text = ""
 
-    def set_start_time(self, time: int):
+    def set_start_time(self, time: int) -> None:
         self.elapsed_time = 0
         self.start_time = time
 
-    def update(self, carrot_count: int):
+    def update(self, carrot_count: int) -> None:
         self.carrot_count = carrot_count
         self.elapsed_time += pygame.time.Clock().tick(60)
         minutes = int(self.elapsed_time / 60000)
         seconds = int((self.elapsed_time % 60000) / 1000)
         self.timer_text = f"{minutes:02d}:{seconds:02d}"
 
-    def render(self):
+    def render(self) -> None:
         self.display_surface.blit(
             self.font.render(self.timer_text, True, (0, 0, 0)),
             (20 + self.shadow_offset, 10 + self.shadow_offset),

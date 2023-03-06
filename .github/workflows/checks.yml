@@ -35,4 +35,4 @@ jobs:
         run: pylint --rcfile=.pylintrc --exit-zero src
 
       - name: Run mypy
-        run: mypy --strict $(git ls-files '*.py')
+        run: mypy --pretty --strict --no-error-summary src

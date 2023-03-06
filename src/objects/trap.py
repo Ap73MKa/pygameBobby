@@ -7,7 +7,7 @@ from src.misc.path import PathManager
 
 
 class Trap(Sprite):
-    def __init__(self, pos: tuple[int, int], groups: list[Group]):
+    def __init__(self, pos: tuple[int, int], groups: list[Group]) -> None:
         super().__init__(*groups)
         self.image = load(
             PathManager.get("assets/graphics/objects/trap_deactivated.png")
@@ -16,7 +16,7 @@ class Trap(Sprite):
         self.rect = self.image.get_rect(topleft=pos)
         self.activate = self.touched = False
 
-    def activate_trap(self):
+    def activate_trap(self) -> None:
         self.activate = True
         self.image = load(PathManager.get("assets/graphics/objects/trap_activated.png"))
         self.image = scale(self.image, (Config.TITLE_SIZE, Config.TITLE_SIZE))

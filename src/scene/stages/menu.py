@@ -1,4 +1,4 @@
-from pygame import Color, QUIT, KEYUP, K_UP, K_DOWN, K_RIGHT, K_LEFT, K_RETURN, Surface
+from pygame import Color, QUIT, KEYUP, K_UP, K_DOWN, K_RIGHT, K_LEFT, K_RETURN, Surface, SurfaceType, Rect
 from pygame.font import Font
 from pygame.transform import scale
 from pygame.image import load
@@ -10,7 +10,7 @@ from src.misc.config import Config
 
 
 class Menu(BaseState):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.level_index = 1
         self.bg_tile = load(PathManager.get("assets/graphics/hud/grass.png")).convert()
@@ -28,7 +28,7 @@ class Menu(BaseState):
         ]
         self.next_state = GameStage.GAMEPLAY
 
-    def render_text(self, index, custom_color=None):
+    def render_text(self, index, custom_color=None) -> Surface | SurfaceType:
         color = (
             Color((255, 255, 255))
             if index == self.active_index
@@ -38,11 +38,11 @@ class Menu(BaseState):
             self.options[index], True, custom_color if custom_color else color
         )
 
-    def get_text_position(self, text, index):
+    def get_text_position(self, text, index) -> Rect:
         center = (self.screen_rect.center[0], self.screen_rect.center[1] + (index * 50))
         return text.get_rect(center=center)
 
-    def handle_action(self):
+    def handle_action(self) -> None:
         if self.active_index == 0:
             self.done = True
         if self.active_index == 1:
@@ -50,7 +50,7 @@ class Menu(BaseState):
         elif self.active_index == 3:
             self.quit = True
 
-    def get_event(self, e):
+    def get_event(self, e) -> None:
         if e.type == QUIT:
             self.quit = True
         elif e.type == KEYUP:
@@ -74,7 +74,7 @@ class Menu(BaseState):
             elif e.key == K_RETURN:
                 self.handle_action()
 
-    def render(self):
+    def render(self) -> None:
         for x in range(Config.WIDTH // Config.TITLE_SIZE):
             for y in range(Config.HEIGHT // Config.TITLE_SIZE):
                 self.surface.blit(

@@ -6,7 +6,7 @@ from src.scene.stages.stage_utils import GameStage
 
 
 class Pause(BaseState):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.title = self.font.render("Game Over", True, Color("white"))
         self.title_rect = self.title.get_rect(center=self.screen_rect.center)
@@ -18,7 +18,7 @@ class Pause(BaseState):
         )
         self.instructions_rect = self.instructions.get_rect(center=instructions_center)
 
-    def get_event(self, e):
+    def get_event(self, e) -> None:
         if e.type == pg.QUIT:
             self.quit = True
         elif e.type == pg.KEYUP:
@@ -31,7 +31,7 @@ class Pause(BaseState):
             elif e.key == pg.K_ESCAPE:
                 self.quit = True
 
-    def render(self):
+    def render(self) -> None:
         self.surface.fill(Color("black"))
         self.surface.blit(self.title, self.title_rect)
         self.surface.blit(self.instructions, self.instructions_rect)

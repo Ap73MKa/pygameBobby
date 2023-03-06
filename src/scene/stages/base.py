@@ -4,7 +4,7 @@ from pygame.event import Event
 
 
 class BaseState:
-    def __init__(self):
+    def __init__(self) -> None:
         self.surface = get_surface()
         self.done = self.quit = False
         self.next_state = None
@@ -12,14 +12,14 @@ class BaseState:
         self.persist = {}
         self.font = Font(None, 24)
 
-    def startup(self, persistent):
+    def startup(self, persistent: dict) -> None:
         self.persist = persistent
 
-    def get_event(self, e: Event):
+    def get_event(self, e: Event) -> None:
         pass
 
-    def update(self, delta: float):
+    def update(self, delta: float) -> None:
         pass
 
-    def render(self):
+    def render(self) -> None:
         pass

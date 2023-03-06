@@ -11,5 +11,5 @@ class PathManager(ABC):
         return str(cls.ROOT.joinpath(path))
 
     @classmethod
-    def get_folder(cls, path: str) -> list:
+    def get_folder(cls, path: str) -> list[Path]:
         return [f for f in Path(cls.get(path)).iterdir() if f.is_file()]

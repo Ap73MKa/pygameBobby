@@ -18,7 +18,7 @@ from src.scene.stages.base import BaseState
 
 
 class Gameplay(BaseState):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.player: Player | None = None
         self.tmx_data: TiledMap | None = None
@@ -41,7 +41,7 @@ class Gameplay(BaseState):
 
         self.on_load()
 
-    def on_load(self):
+    def on_load(self) -> None:
         # Reset
         self.visible_sprites.empty()
         self.collision_sprites.empty()
@@ -66,7 +66,7 @@ class Gameplay(BaseState):
             self.start_pos, self.visible_sprites, self.collision_sprites
         )
 
-    def load_map(self):
+    def load_map(self) -> None:
         for layer in self.tmx_data.visible_layers:
             if not hasattr(layer, "data"):
                 break
@@ -110,8 +110,8 @@ class Gameplay(BaseState):
                 pos = (x * Config.TITLE_SIZE, y * Config.TITLE_SIZE)
                 Trap(pos, [self.traps_group, self.visible_sprites])
 
-    def check_collide(self):
-        level_trigger = self.level_triggers_group.sprites()[0]
+    def check_collide(self) -> None:
+        level_trigger: Trigger = self.level_triggers_group.sprites()[0]
         if (
             level_trigger.rect.topleft == self.player.pos
             and self.carrots_count == self.found_carrots
@@ -135,7 +135,7 @@ class Gameplay(BaseState):
             elif trap.touched and not trap.activate:
                 trap.activate_trap()
 
-    def timeout_death(self):
+    def timeout_death(self) -> None:
         self.player.die()
         if not self.is_player_died:
             self.is_player_died = True
@@ -143,21 +143,21 @@ class Gameplay(BaseState):
         if get_ticks() - self.die_time >= 500:
             self.on_load()
 
-    def check_end(self):
+    def check_end(self) -> None:
         if self.carrots_count == self.found_carrots:
             trigger: Trigger = self.level_triggers_group.sprites()[0]
             trigger.activate()
 
-    def get_event(self, e):
+    def get_event(self, e) -> None:
         self.done = e.type == KEYUP and e.key == K_ESCAPE
 
-    def update(self, delta: float):
+    def update(self, delta: float) -> None:
         self.check_collide()
         self.visible_sprites.custom_update(self.player, self.corner, delta)
         self.visible_sprites.update(delta)
         self.check_end()
         self.ui.update(self.carrots_count - self.found_carrots)
 
-    def render(self):
+    def render(self) -> None:
         self.visible_sprites.custom_render()
         self.ui.render()

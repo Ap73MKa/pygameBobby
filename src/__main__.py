@@ -1,4 +1,4 @@
-from pygame import quit as game_quit
+from pygame import quit as game_quit, Surface, SurfaceType
 from pygame import init, DOUBLEBUF, QUIT, display
 from pygame.display import set_caption, set_mode
 from pygame.event import get as get_event
@@ -12,7 +12,7 @@ from src.scene.stages.stage_utils import GameStage
 
 
 class Game:
-    def __init__(self):
+    def __init__(self) -> None:
         self._running = True
         self.size = self.width, self.height = Config.WIDTH, Config.HEIGHT
         self.screen = self.on_init()
@@ -24,29 +24,29 @@ class Game:
         }
         self.stage = self.stages[GameStage.MENU]
 
-    def flip_state(self):
+    def flip_state(self) -> None:
         self.stage.done = False
         self.stage = self.stages[self.stage.next_state]
         self.stage.startup(self.stage.persist)
 
-    def on_init(self):
+    def on_init(self) -> Surface | SurfaceType:
         init()
         set_caption("Bobby Carrot")
         return set_mode(self.size, DOUBLEBUF)
 
-    def on_event(self):
+    def on_event(self) -> None:
         for event in get_event():
             self._running = not event.type == QUIT
             self.stage.get_event(event)
 
-    def on_update(self, delta):
+    def on_update(self, delta) -> None:
         if self.stage.quit:
             self._running = False
         elif self.stage.done:
             self.flip_state()
         self.stage.update(delta)
 
-    def on_render(self):
+    def on_render(self) -> None:
         self.stage.render()
         display.update()
 
