@@ -1,6 +1,5 @@
 from pygame.font import Font
 from pygame.display import get_surface
-from pygame import event
 from pygame.event import Event
 
 

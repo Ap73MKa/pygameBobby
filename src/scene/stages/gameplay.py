@@ -9,11 +9,12 @@ from src.misc.config import Config
 from src.misc.path import PathManager
 from src.objects.player import Player
 from src.objects.trap import Trap
-from src.scenes.camera import CameraGroup
+from src.objects.trigger import Trigger
+from src.scene.camera import CameraGroup
 from src.objects.tile import Tile
-from src.scenes.stages.stage_utils import GameStage
-from src.scenes.ui import UI
-from src.scenes.stages.base import BaseState
+from src.scene.stages.stage_utils import GameStage
+from src.scene.ui import UI
+from src.scene.stages.base import BaseState
 
 
 class Gameplay(BaseState):
@@ -26,37 +27,38 @@ class Gameplay(BaseState):
         self.index_map = 1
         self.corner = Vector2(Config.WIDTH, Config.HEIGHT)
         self.next_state = GameStage.PAUSE
-        self.ui = UI()
+        self.is_player_died = False
+        self.die_time = get_ticks()
 
         # Groups
         self.display_surface = get_surface()
         self.visible_sprites = CameraGroup()
         self.collision_sprites = Group()
-        self.trap_sprites = Group()
-        self.carrots_sprites = Group()
-        self.trigger_group = Group()
+        self.level_triggers_group = Group()
+        self.carrots_group = Group()
+        self.traps_group = Group()
+        self.ui = UI()
 
         self.on_load()
 
     def on_load(self):
-        self.tmx_data = load_pygame(
-            PathManager.get(f"assets/maps/map{self.index_map}.tmx")
-        )
-        self.corner = Vector2(
-            self.tmx_data.width * Config.TITLE_SIZE,
-            self.tmx_data.height * Config.TITLE_SIZE,
-        )
-        self.carrots_count = self.found_carrots = 0
+        # Reset
         self.visible_sprites.empty()
         self.collision_sprites.empty()
-        self.trigger_group.empty()
-        self.trap_sprites.empty()
-        self.ui.set_start_time(get_ticks())
+        self.level_triggers_group.empty()
+        self.carrots_group.empty()
+        self.traps_group.empty()
+
+        self.carrots_count = self.found_carrots = 0
+        self.is_player_died = False
         self.player = None
+        self.ui.set_start_time(get_ticks())
+
+        # Load
+        self.tmx_data = load_pygame(PathManager.get(f"assets/maps/map{self.index_map}.tmx"))
+        self.corner = Vector2(self.tmx_data.width, self.tmx_data.height) * Config.TITLE_SIZE
         self.load_map()
-        self.player = Player(
-            self.start_pos, self.visible_sprites, self.collision_sprites
-        )
+        self.player = Player(self.start_pos, self.visible_sprites, self.collision_sprites)
 
     def load_map(self):
         for layer in self.tmx_data.visible_layers:
@@ -70,11 +72,7 @@ class Gameplay(BaseState):
         if hasattr(layer, "data"):
             for x, y, surf in layer.tiles():
                 pos = (x * Config.TITLE_SIZE, y * Config.TITLE_SIZE)
-                Tile(
-                    pos,
-                    Surface((Config.TITLE_SIZE, Config.TITLE_SIZE)),
-                    [self.collision_sprites],
-                )
+                Tile(pos, Surface((Config.TITLE_SIZE, Config.TITLE_SIZE)), [self.collision_sprites])
 
         layer = self.tmx_data.get_layer_by_name("player")
         if hasattr(layer, "data"):
@@ -86,49 +84,56 @@ class Gameplay(BaseState):
         if hasattr(layer, "data"):
             for x, y, surf in layer.tiles():
                 pos = (x * Config.TITLE_SIZE, y * Config.TITLE_SIZE)
-                Tile(pos, surf, [self.trigger_group, self.visible_sprites])
+                surf.fill('black')
+                Trigger(pos, [self.level_triggers_group, self.visible_sprites])
 
         layer = self.tmx_data.get_layer_by_name("carrots")
         if hasattr(layer, "data"):
             for x, y, surf in layer.tiles():
                 self.carrots_count += 1
                 pos = (x * Config.TITLE_SIZE, y * Config.TITLE_SIZE)
-                Tile(pos, surf, [self.carrots_sprites, self.visible_sprites])
+                Tile(pos, surf, [self.carrots_group, self.visible_sprites])
 
         layer = self.tmx_data.get_layer_by_name("trap")
         if hasattr(layer, "data"):
             for x, y, surf in layer.tiles():
                 pos = (x * Config.TITLE_SIZE, y * Config.TITLE_SIZE)
-                Trap(pos, surf, [self.trap_sprites, self.visible_sprites])
+                Trap(pos, [self.traps_group, self.visible_sprites])
 
     def check_collide(self):
-        for sprite in self.trigger_group:
-            if sprite.rect.collidepoint(self.player.pos.x, self.player.pos.y):
-                if self.carrots_count == self.found_carrots:
-                    self.index_map += 1
-                    self.on_load()
+        level_trigger = self.level_triggers_group.sprites()[0]
+        if level_trigger.rect.topleft == self.player.pos and self.carrots_count == self.found_carrots:
+            if self.index_map >= Config.MAX_LEVEL:
+                self.done = True
+                return
+            self.index_map += 1
+            self.on_load()
 
-        for carrot in list(
-            filter(
-                lambda sprite: sprite.rect.topleft == self.player.pos,
-                self.carrots_sprites,
-            )
-        ):
-            self.found_carrots += 1
-            carrot.kill()
+        for carrot in self.carrots_group:
+            if carrot.rect.topleft == self.player.pos:
+                self.found_carrots += 1
+                carrot.kill()
 
-        for sprite in self.trap_sprites:
-            sprite: Trap
-            if (
-                sprite.rect.x == self.player.pos.x
-                and sprite.rect.y == self.player.pos.y
-            ):
-                sprite.touched = True
-                if sprite.activate:
-                    self.on_load()
-            elif sprite.touched:
-                if not sprite.activate:
-                    sprite.activate_trap()
+        for trap in self.traps_group:
+            if trap.rect.topleft == self.player.pos:
+                trap.touched = True
+                if trap.activate:
+                    self.timeout_death()
+            elif trap.touched and not trap.activate:
+                trap.activate_trap()
+
+    def timeout_death(self):
+        self.player.die()
+        if not self.is_player_died:
+            self.is_player_died = True
+            self.die_time = get_ticks()
+        if get_ticks() - self.die_time >= 500:
+            self.on_load()
+
+    def check_end(self):
+        if self.carrots_count == self.found_carrots:
+            trigger: Trigger = self.level_triggers_group.sprites()[0]
+            trigger.activate()
 
     def get_event(self, e):
         self.done = e.type == KEYUP and e.key == K_ESCAPE
@@ -137,6 +142,7 @@ class Gameplay(BaseState):
         self.check_collide()
         self.visible_sprites.custom_update(self.player, self.corner, delta)
         self.visible_sprites.update(delta)
+        self.check_end()
         self.ui.update(self.carrots_count - self.found_carrots)
 
     def render(self):

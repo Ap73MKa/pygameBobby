@@ -33,7 +33,7 @@ class UI:
         self.elapsed_time += pygame.time.Clock().tick(60)
         minutes = int(self.elapsed_time / 60000)
         seconds = int((self.elapsed_time % 60000) / 1000)
-        self.timer_text = "{:02d}:{:02d}".format(minutes, seconds)
+        self.timer_text = f'{minutes:02d}:{seconds:02d}'
 
     def render(self):
         self.display_surface.blit(

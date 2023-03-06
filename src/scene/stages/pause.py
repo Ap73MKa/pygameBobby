@@ -2,7 +2,7 @@ import pygame as pg
 
 from pygame import Color
 from .base import BaseState
-from src.scenes.stages.stage_utils import GameStage
+from src.scene.stages.stage_utils import GameStage
 
 
 class Pause(BaseState):

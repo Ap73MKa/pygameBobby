@@ -1,7 +1,8 @@
 from enum import IntEnum, auto
 
-import pygame.sprite
-from pygame import Vector2
+from pygame import Vector2, K_UP, K_w, K_DOWN, K_s, K_LEFT, K_l, K_RIGHT, K_r
+from pygame.key import get_pressed
+from pygame.sprite import Sprite, Group
 from pygame.time import get_ticks
 from pygame.transform import scale
 
@@ -18,20 +19,21 @@ class AnimEnum(IntEnum):
     IDLE = auto()
     DYING = auto()
     FADING = auto()
+    UNFADING = auto()
 
 
-class Player(pygame.sprite.Sprite):
+class Player(Sprite):
     def __init__(
-        self, pos, group: pygame.sprite.Group, collision_group: pygame.sprite.Group
+            self, pos, group: Group, collision_group: Group
     ):
         super().__init__(group)
         # animation
         self.frame = 0
         self.frame_speed = 35
-        self.anim_state: AnimEnum = AnimEnum.IDLE
+        self.anim_state: AnimEnum = AnimEnum.UNFADING
         self.is_inactive = False
         self.sprites = self.import_animations()
-        self.image = self.sprites[AnimEnum.DOWN][self.frame]
+        self.image = self.sprites[AnimEnum.UNFADING][self.frame]
 
         # movement
         image_size = self.image.get_size()
@@ -45,9 +47,10 @@ class Player(pygame.sprite.Sprite):
         self.target_pos = Vector2(self.rect.center)
         self.direction = Vector2()
         self.move_speed = 4
-        self.dx = self.dy = .0
+        self.dx = self.dy = 0.0
 
-        self.inactive_start = pygame.time.get_ticks()
+        self.is_dying = False
+        self.inactive_start = get_ticks()
         self.collision_group = collision_group
 
     @staticmethod
@@ -58,34 +61,36 @@ class Player(pygame.sprite.Sprite):
         ]
 
     def import_animations(self):
-        anim_names = "right down left up idle fading dying".strip().split()
+        anim_names = "right down left up idle dying fading unfading".strip().split()
         anim_path = "assets/graphics/player"
         return [
             self.upscale(
-                SpriteSheet(PathManager.get(f"{anim_path}/{anim}.png"), (18, 25))
+                SpriteSheet(PathManager.get(f"{anim_path}/{anim}.png"),
+                            (18, 25) if anim != 'dying' else (22, 27))
             )
             for anim in anim_names
         ]
 
     def input(self):
-        if not (self.is_target_pos() and self.dx == self.dy == 0):
+        if not (self.is_target_pos() and self.dx == self.dy == 0)\
+                or self.anim_state in [AnimEnum.DYING, AnimEnum.FADING]:
             return
 
-        keys = pygame.key.get_pressed()
+        keys = get_pressed()
 
-        if keys[pygame.K_UP]:
+        if keys[K_UP] or keys[K_w]:
             self.direction.y = -1
             self.anim_state = AnimEnum.UP
-        elif keys[pygame.K_DOWN]:
+        elif keys[K_DOWN] or keys[K_s]:
             self.direction.y = 1
             self.anim_state = AnimEnum.DOWN
         else:
             self.direction.y = 0
 
-        if keys[pygame.K_LEFT]:
+        if keys[K_LEFT] or keys[K_l]:
             self.direction.x = -1
             self.anim_state = AnimEnum.LEFT
-        elif keys[pygame.K_RIGHT]:
+        elif keys[K_RIGHT] or keys[K_r]:
             self.direction.x = 1
             self.anim_state = AnimEnum.RIGHT
         else:
@@ -96,8 +101,8 @@ class Player(pygame.sprite.Sprite):
 
     def is_target_pos(self) -> bool:
         return (
-            abs(self.pos.x - self.target_pos.x) <= 2
-            and abs(self.pos.y - self.target_pos.y) <= 2
+                abs(self.pos.x - self.target_pos.x) <= 2
+                and abs(self.pos.y - self.target_pos.y) <= 2
         )
 
     def move(self, delta: float):
@@ -118,13 +123,23 @@ class Player(pygame.sprite.Sprite):
     def animate(self, delta):
         animation = self.sprites[self.anim_state]
         self.frame += self.frame_speed * delta / 2
-        if self.is_inactive and self.anim_state != AnimEnum.IDLE:
+        if self.is_inactive and self.anim_state not in \
+                [AnimEnum.IDLE, AnimEnum.DYING, AnimEnum.FADING, AnimEnum.UNFADING]:
             self.frame = 0
             self.image = animation[self.frame]
             return
         if self.frame >= len(animation):
-            self.frame = 0
+            if self.anim_state in [AnimEnum.DYING, AnimEnum.FADING, AnimEnum.UNFADING]:
+                self.frame = len(animation) - 1
+            else:
+                self.frame = 0
         self.image = animation[int(self.frame)]
+
+    def die(self):
+        self.anim_state = AnimEnum.DYING
+        if not self.is_dying:
+            self.frame = 0
+            self.is_dying = True
 
     def collision(self):
         test_rect = self.rect.copy()
@@ -139,7 +154,7 @@ class Player(pygame.sprite.Sprite):
         if not self.is_inactive:
             self.inactive_start = get_ticks()
             return
-        if get_ticks() - self.inactive_start >= 5000:
+        if get_ticks() - self.inactive_start >= 8000:
             self.anim_state = AnimEnum.IDLE
 
     def update(self, delta: float):
