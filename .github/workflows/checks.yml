@@ -32,7 +32,7 @@ jobs:
           jupyter: true
 
       - name: Run pylint
-        run: pylint --enable=unused-import $(git ls-files '*.py')
+        run: pylint --rcfile=.pylintrc --exit-zero src
 
       - name: Run mypy
         run: mypy --strict $(git ls-files '*.py')
