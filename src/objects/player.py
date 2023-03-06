@@ -23,9 +23,7 @@ class AnimEnum(IntEnum):
 
 
 class Player(Sprite):
-    def __init__(
-            self, pos, group: Group, collision_group: Group
-    ):
+    def __init__(self, pos, group: Group, collision_group: Group):
         super().__init__(group)
         # animation
         self.frame = 0
@@ -65,15 +63,18 @@ class Player(Sprite):
         anim_path = "assets/graphics/player"
         return [
             self.upscale(
-                SpriteSheet(PathManager.get(f"{anim_path}/{anim}.png"),
-                            (18, 25) if anim != 'dying' else (22, 27))
+                SpriteSheet(
+                    PathManager.get(f"{anim_path}/{anim}.png"),
+                    (18, 25) if anim != "dying" else (22, 27),
+                )
             )
             for anim in anim_names
         ]
 
     def input(self):
-        if not (self.is_target_pos() and self.dx == self.dy == 0)\
-                or self.anim_state in [AnimEnum.DYING, AnimEnum.FADING]:
+        if not (
+            self.is_target_pos() and self.dx == self.dy == 0
+        ) or self.anim_state in [AnimEnum.DYING, AnimEnum.FADING]:
             return
 
         keys = get_pressed()
@@ -101,8 +102,8 @@ class Player(Sprite):
 
     def is_target_pos(self) -> bool:
         return (
-                abs(self.pos.x - self.target_pos.x) <= 2
-                and abs(self.pos.y - self.target_pos.y) <= 2
+            abs(self.pos.x - self.target_pos.x) <= 2
+            and abs(self.pos.y - self.target_pos.y) <= 2
         )
 
     def move(self, delta: float):
@@ -123,8 +124,12 @@ class Player(Sprite):
     def animate(self, delta):
         animation = self.sprites[self.anim_state]
         self.frame += self.frame_speed * delta / 2
-        if self.is_inactive and self.anim_state not in \
-                [AnimEnum.IDLE, AnimEnum.DYING, AnimEnum.FADING, AnimEnum.UNFADING]:
+        if self.is_inactive and self.anim_state not in [
+            AnimEnum.IDLE,
+            AnimEnum.DYING,
+            AnimEnum.FADING,
+            AnimEnum.UNFADING,
+        ]:
             self.frame = 0
             self.image = animation[self.frame]
             return

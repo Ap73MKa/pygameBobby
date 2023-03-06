@@ -55,10 +55,16 @@ class Gameplay(BaseState):
         self.ui.set_start_time(get_ticks())
 
         # Load
-        self.tmx_data = load_pygame(PathManager.get(f"assets/maps/map{self.index_map}.tmx"))
-        self.corner = Vector2(self.tmx_data.width, self.tmx_data.height) * Config.TITLE_SIZE
+        self.tmx_data = load_pygame(
+            PathManager.get(f"assets/maps/map{self.index_map}.tmx")
+        )
+        self.corner = (
+            Vector2(self.tmx_data.width, self.tmx_data.height) * Config.TITLE_SIZE
+        )
         self.load_map()
-        self.player = Player(self.start_pos, self.visible_sprites, self.collision_sprites)
+        self.player = Player(
+            self.start_pos, self.visible_sprites, self.collision_sprites
+        )
 
     def load_map(self):
         for layer in self.tmx_data.visible_layers:
@@ -72,7 +78,11 @@ class Gameplay(BaseState):
         if hasattr(layer, "data"):
             for x, y, surf in layer.tiles():
                 pos = (x * Config.TITLE_SIZE, y * Config.TITLE_SIZE)
-                Tile(pos, Surface((Config.TITLE_SIZE, Config.TITLE_SIZE)), [self.collision_sprites])
+                Tile(
+                    pos,
+                    Surface((Config.TITLE_SIZE, Config.TITLE_SIZE)),
+                    [self.collision_sprites],
+                )
 
         layer = self.tmx_data.get_layer_by_name("player")
         if hasattr(layer, "data"):
@@ -84,7 +94,7 @@ class Gameplay(BaseState):
         if hasattr(layer, "data"):
             for x, y, surf in layer.tiles():
                 pos = (x * Config.TITLE_SIZE, y * Config.TITLE_SIZE)
-                surf.fill('black')
+                surf.fill("black")
                 Trigger(pos, [self.level_triggers_group, self.visible_sprites])
 
         layer = self.tmx_data.get_layer_by_name("carrots")
@@ -102,7 +112,10 @@ class Gameplay(BaseState):
 
     def check_collide(self):
         level_trigger = self.level_triggers_group.sprites()[0]
-        if level_trigger.rect.topleft == self.player.pos and self.carrots_count == self.found_carrots:
+        if (
+            level_trigger.rect.topleft == self.player.pos
+            and self.carrots_count == self.found_carrots
+        ):
             if self.index_map >= Config.MAX_LEVEL:
                 self.done = True
                 return

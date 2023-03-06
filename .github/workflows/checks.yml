@@ -27,7 +27,7 @@ jobs:
       - name: Run black
         uses: psf/black@stable
         with:
-          options: "--check --verbose --diff $(git ls-files '*.py')"
+          options: "--check --verbose --diff"
           src: "./src"
           jupyter: true
 
