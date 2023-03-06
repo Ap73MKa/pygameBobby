@@ -1,6 +1,6 @@
 from pytmx import TiledMap
 from pytmx.util_pygame import load_pygame
-from pygame import Surface, Vector2, KEYUP, K_ESCAPE
+from pygame import Surface, Vector2, KEYUP, K_ESCAPE, QUIT
 from pygame.display import get_surface
 from pygame.sprite import Group
 from pygame.time import get_ticks
@@ -155,6 +155,7 @@ class Gameplay(State):
 
     def get_event(self, e) -> None:
         self.done = e.type == KEYUP and e.key == K_ESCAPE
+        self.quit = e.type == QUIT
 
     def update(self, delta: float) -> None:
         self.check_collide()

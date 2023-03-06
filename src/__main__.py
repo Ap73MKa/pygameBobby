@@ -1,14 +1,11 @@
-from pygame import quit as game_quit, Surface, SurfaceType
-from pygame import init, DOUBLEBUF, QUIT, display
+import pygame as pg
+from pygame import Surface, SurfaceType
 from pygame.display import set_caption, set_mode
 from pygame.event import get as events
 from pygame.time import Clock
 
 from src.misc.config import Config
-from src.scene.states.menu import Menu
-from src.scene.states.gameplay import Gameplay
-from src.scene.states.pause import Pause
-from src.scene.states.stage_utils import GameStage
+from src.scene.states.state_manager import StateManager
 
 
 class Game:
@@ -16,41 +13,26 @@ class Game:
         self._running = True
         self.size = self.width, self.height = Config.WIDTH, Config.HEIGHT
         self.screen = self.on_init()
+        self.manager = StateManager()
         self.clock = Clock()
-        self.stages = {
-            GameStage.MENU: Menu(),
-            GameStage.GAMEPLAY: Gameplay(),
-            GameStage.PAUSE: Pause(),
-        }
-        self.stage = self.stages[GameStage.MENU]
-
-    def flip_state(self) -> None:
-        self.stage.done = False
-        persistent = self.stage.persist
-        print(persistent)
-        self.stage = self.stages[self.stage.next_state]
-        self.stage.startup(persistent)
 
     def on_init(self) -> Surface | SurfaceType:
-        init()
+        pg.init()
         set_caption("Bobby Carrot")
-        return set_mode(self.size, DOUBLEBUF)
+        return set_mode(self.size, pg.DOUBLEBUF)
 
     def on_event(self) -> None:
         for event in events():
-            self._running = not event.type == QUIT
-            self.stage.get_event(event)
+            self._running = event.type == pg.QUIT
+            self.manager.get_event(event)
 
     def on_update(self, delta) -> None:
-        if self.stage.quit:
-            self._running = False
-        elif self.stage.done:
-            self.flip_state()
-        self.stage.update(delta)
+        self._running = self.manager.is_running()
+        self.manager.update(delta)
 
     def on_render(self) -> None:
-        self.stage.render()
-        display.update()
+        self.manager.render()
+        pg.display.update()
 
     def on_execute(self) -> None:
         delta = 0
@@ -59,7 +41,7 @@ class Game:
             self.on_update(delta)
             self.on_render()
             delta = self.clock.tick(Config.FPS) / 1000
-        game_quit()
+        pg.quit()
 
 
 if __name__ == "__main__":
