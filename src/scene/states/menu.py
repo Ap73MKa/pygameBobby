@@ -30,7 +30,6 @@ class Menu(State):
         self.options = [
             "New game",
             f"Choose level <{self.level_index}>",
-            "Credit",
             "Quit",
         ]
         self.next_state = GameState.GAMEPLAY
@@ -60,7 +59,7 @@ class Menu(State):
         if self.active_index == 1:
             self.persist = {"level": self.level_index, "reload": True}
             self.done = True
-        elif self.active_index == 3:
+        elif self.active_index == 2:
             self.quit = True
 
     def handle_option_index(self, move: int = 0):

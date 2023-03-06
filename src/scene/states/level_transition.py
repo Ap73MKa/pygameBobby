@@ -20,6 +20,7 @@ class LevelTransition(State):
 
     def startup(self, persistent: dict) -> None:
         self.is_drawn_once = False
+        self.level = 1
         for key, item in persistent.items():
             if key == "level":
                 self.level = item
@@ -32,7 +33,7 @@ class LevelTransition(State):
         if e.type == pg.QUIT:
             self.quit = True
         elif e.type == pg.KEYUP:
-            if self.level >= Config.MAX_LEVEL:
+            if self.level > Config.MAX_LEVEL:
                 self.next_state = GameState.MENU
             else:
                 self.persist = {"level": self.level}

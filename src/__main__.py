@@ -1,11 +1,12 @@
 import pygame as pg
 from pygame import Surface, SurfaceType
-from pygame.display import set_caption, set_mode
+from pygame.display import set_caption, set_mode, set_icon
 from pygame.event import get as events
+from pygame.image import load
 from pygame.time import Clock
 from pygame.transform import scale
 
-from src.misc import Config
+from src.misc import Config, PathManager
 from src.scene import StateManager
 
 
@@ -21,6 +22,7 @@ class Game:
     def on_init(self) -> Surface | SurfaceType:
         pg.init()
         set_caption("Bobby Carrot")
+        set_icon(load(PathManager.get('assets/graphics/icon.png')))
         return set_mode(self.size, pg.DOUBLEBUF)
 
     def on_event(self) -> None:

@@ -11,6 +11,7 @@ from src.scene.ui import UI
 from src.scene.camera import CameraGroup
 from .stage_utils import GameState
 from .state import State
+from ...objects.player import AnimEnum
 
 
 class Gameplay(State):
@@ -130,6 +131,7 @@ class Gameplay(State):
                 "time": self.ui.timer_text,
                 "steps": self.player.get_step_count(),
             }
+            self.player.anim_state = AnimEnum.FADING
             self.done = True
 
         for carrot in self.carrots_group:
