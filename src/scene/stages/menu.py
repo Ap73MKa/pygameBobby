@@ -1,4 +1,16 @@
-from pygame import Color, QUIT, KEYUP, K_UP, K_DOWN, K_RIGHT, K_LEFT, K_RETURN, Surface, SurfaceType, Rect
+from pygame import (
+    Color,
+    QUIT,
+    KEYUP,
+    K_UP,
+    K_DOWN,
+    K_RIGHT,
+    K_LEFT,
+    K_RETURN,
+    Surface,
+    SurfaceType,
+    Rect,
+)
 from pygame.font import Font
 from pygame.transform import scale
 from pygame.image import load
