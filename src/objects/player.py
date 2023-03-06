@@ -4,7 +4,6 @@ from pygame import Vector2, K_UP, K_w, K_DOWN, K_s, K_LEFT, K_l, K_RIGHT, K_r
 from pygame.key import get_pressed
 from pygame.sprite import Sprite, Group
 from pygame.time import get_ticks
-from pygame.transform import scale
 
 from src.misc.config import Config
 from src.misc.path import PathManager
@@ -52,22 +51,14 @@ class Player(Sprite):
         self.collision_group = collision_group
 
     @staticmethod
-    def upscale(sprite_sheet: SpriteSheet):
-        return [
-            scale(image, (image.get_size()[0] * 3, image.get_size()[1] * 3))
-            for image in sprite_sheet[0]
-        ]
-
-    def import_animations(self):
+    def import_animations():
         anim_names = "right down left up idle dying fading unfading".strip().split()
         anim_path = "assets/graphics/player"
         return [
-            self.upscale(
-                SpriteSheet(
-                    PathManager.get(f"{anim_path}/{anim}.png"),
-                    (18, 25) if anim != "dying" else (22, 27),
-                )
-            )
+            SpriteSheet(
+                PathManager.get(f"{anim_path}/{anim}.png"),
+                (18, 25) if anim != "dying" else (22, 27),
+            )[0]
             for anim in anim_names
         ]
 

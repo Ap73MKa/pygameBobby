@@ -1,5 +1,5 @@
 import pygame.display
-from pygame.transform import scale
+from pygame import Surface
 
 from src.misc.config import Config
 from src.misc.path import PathManager
@@ -7,19 +7,14 @@ from src.misc.path import PathManager
 
 class UI:
     def __init__(self) -> None:
-        self.display_surface = pygame.display.get_surface()
         self.start_time = pygame.time.get_ticks()
         self.font = pygame.font.Font(
-            PathManager.get("assets/graphics/hud/font.ttf"), 28
+            PathManager.get("assets/graphics/hud/font.ttf"), 10
         )
         self.carrot_img = pygame.image.load(
             PathManager.get("assets/graphics/hud/carrot.png")
         )
-        self.carrot_img = scale(
-            self.carrot_img,
-            (self.carrot_img.get_size()[0] * 3, self.carrot_img.get_size()[1] * 3),
-        )
-        self.shadow_offset = 4
+        self.shadow_offset = 1
         self.carrot_count = 0
         self.elapsed_time = 0
         self.timer_text = ""
@@ -35,29 +30,27 @@ class UI:
         seconds = int((self.elapsed_time % 60000) / 1000)
         self.timer_text = f"{minutes:02d}:{seconds:02d}"
 
-    def render(self) -> None:
-        self.display_surface.blit(
-            self.font.render(self.timer_text, True, (0, 0, 0)),
-            (20 + self.shadow_offset, 10 + self.shadow_offset),
+    def render(self, game_screen: Surface) -> None:
+        game_screen.blit(
+            self.font.render(self.timer_text, False, (0, 0, 0)),
+            (2 + self.shadow_offset, 2 + self.shadow_offset),
         )
-        self.display_surface.blit(
-            self.font.render(self.timer_text, True, (255, 255, 255)), (20, 10)
+        game_screen.blit(
+            self.font.render(self.timer_text, False, (255, 255, 255)), (2, 2)
         )
         if self.carrot_count <= 0:
             return
 
-        self.display_surface.blit(
-            self.carrot_img, (Config.WIDTH - Config.TITLE_SIZE, 5)
-        )
-        self.display_surface.blit(
-            self.font.render(str(self.carrot_count), True, (0, 0, 0)),
+        game_screen.blit(self.carrot_img, (Config.WIDTH - Config.TITLE_SIZE, 2))
+        game_screen.blit(
+            self.font.render(str(self.carrot_count), False, (0, 0, 0)),
             (
                 Config.WIDTH - Config.TITLE_SIZE * 2 + self.shadow_offset,
-                10 + self.shadow_offset,
+                2 + self.shadow_offset,
             ),
         )
 
-        self.display_surface.blit(
-            self.font.render(str(self.carrot_count), True, (255, 255, 255)),
-            (Config.WIDTH - Config.TITLE_SIZE * 2, 10),
+        game_screen.blit(
+            self.font.render(str(self.carrot_count), False, (255, 255, 255)),
+            (Config.WIDTH - Config.TITLE_SIZE * 2, 2),
         )

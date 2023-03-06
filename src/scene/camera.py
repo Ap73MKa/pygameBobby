@@ -1,5 +1,5 @@
+from pygame import Surface
 from pygame.sprite import Sprite, Group
-from pygame.display import get_surface
 from pygame.math import Vector2
 
 from src.objects.player import Player
@@ -9,8 +9,7 @@ from src.misc.config import Config
 class CameraGroup(Group):
     def __init__(self):
         super().__init__()
-        self.display_surface = get_surface()
-        self.size = Vector2(*self.display_surface.get_size())
+        self.size = Vector2((Config.WIDTH, Config.HEIGHT))
         self.camera = Vector2(*(self.size // 2))
         self.offset = Vector2()
 
@@ -37,10 +36,10 @@ class CameraGroup(Group):
         self.offset.x = round(self.offset.x)
         self.offset.y = round(self.offset.y)
 
-    def custom_render(self):
-        self.display_surface.fill("black")
+    def custom_render(self, game_screen: Surface):
+        game_screen.fill("black")
         for sprite in self.sprites():
             if not self.is_visible(sprite):
                 continue
             offset_pos = sprite.rect.topleft - self.offset
-            self.display_surface.blit(sprite.image, offset_pos)
+            game_screen.blit(sprite.image, offset_pos)

@@ -1,37 +1,82 @@
 import pygame as pg
 
-from pygame import Color
+from pygame import Color, Surface, SurfaceType, Rect
+from pygame.font import Font
+from pygame.image import load
+
 from .state import State
-from src.scene.states.stage_utils import GameStage
+from src.scene.states.stage_utils import GameState
+from src.misc.config import Config
+from src.misc.path import PathManager
 
 
 class Pause(State):
     def __init__(self) -> None:
         super().__init__()
-        self.title = self.font.render("Game Over", True, Color("white"))
-        self.title_rect = self.title.get_rect(center=self.screen_rect.center)
-        text = "Press space to start again, or enter to go to the menu"
-        self.instructions = self.font.render(text, True, Color("white"))
-        instructions_center = (
-            self.screen_rect.center[0],
-            self.screen_rect.center[1] + 50,
-        )
-        self.instructions_rect = self.instructions.get_rect(center=instructions_center)
+        self.bg_tile = load(PathManager.get("assets/graphics/hud/grass.png")).convert()
+        self.font = Font(PathManager.get("assets/graphics/hud/font.ttf"), 10)
+        self.center = (Config.WIDTH // 2, Config.HEIGHT // 2)
+        self.active_index = 0
+        self.options = ["Continue", "Back to menu", "Exit"]
+        self.persist = {}
+
+    def handle_action(self) -> None:
+        if self.active_index == 0:
+            self.next_state = GameState.GAMEPLAY
+            self.done = True
+        if self.active_index == 1:
+            self.next_state = GameState.MENU
+            self.done = True
+        elif self.active_index == 2:
+            self.quit = True
+
+    def handle_option_index(self, move: int = 0):
+        self.active_index += move
+        if self.active_index < 0:
+            self.active_index = len(self.options) - 1
+        self.active_index %= len(self.options)
 
     def get_event(self, e) -> None:
         if e.type == pg.QUIT:
             self.quit = True
         elif e.type == pg.KEYUP:
-            if e.key == pg.K_RETURN:
-                self.next_state = GameStage.MENU
-                self.done = True
-            elif e.key == pg.K_SPACE:
-                self.next_state = GameStage.GAMEPLAY
-                self.done = True
-            elif e.key == pg.K_ESCAPE:
-                self.quit = True
+            if e.key == pg.K_UP:
+                self.handle_option_index(-1)
+            elif e.key == pg.K_DOWN:
+                self.handle_option_index(1)
+            elif e.key == pg.K_RETURN:
+                self.handle_action()
 
-    def render(self) -> None:
-        self.surface.fill(Color("black"))
-        self.surface.blit(self.title, self.title_rect)
-        self.surface.blit(self.instructions, self.instructions_rect)
+    def render_text(self, index, custom_color=None) -> Surface | SurfaceType:
+        color = (
+            Color((255, 255, 255))
+            if index == self.active_index
+            else Color((100, 100, 100))
+        )
+        return self.font.render(
+            self.options[index], False, custom_color if custom_color else color
+        )
+
+    def get_text_position(self, text, index) -> Rect:
+        center = (self.center[0], self.center[1] + (index * 20))
+        return text.get_rect(center=center)
+
+    def render(self, game_screen: Surface) -> None:
+        # Background
+        for x in range(Config.WIDTH // Config.TITLE_SIZE):
+            for y in range(Config.HEIGHT // Config.TITLE_SIZE):
+                game_screen.blit(
+                    self.bg_tile, (x * Config.TITLE_SIZE, y * Config.TITLE_SIZE)
+                )
+        dark = Surface((Config.WIDTH, Config.HEIGHT))
+        dark.fill((0, 0, 0))
+        dark.set_alpha(100)
+        game_screen.blit(dark, (0, 0))
+
+        # Options
+        for index, _ in enumerate(self.options):
+            text_render = self.render_text(index, (0, 0, 0))
+            pos = self.get_text_position(text_render, index)
+            game_screen.blit(text_render, (pos[0] + 1, pos[1] + 1))
+            text_render = self.render_text(index)
+            game_screen.blit(text_render, pos)

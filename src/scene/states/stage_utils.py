@@ -1,7 +1,7 @@
 from enum import IntEnum, auto
 
 
-class GameStage(IntEnum):
+class GameState(IntEnum):
     MENU = auto()
     GAMEPLAY = auto()
     PAUSE = auto()

@@ -1,18 +1,20 @@
+from pygame import Surface
+
 from src.scene.states.gameplay import Gameplay
 from src.scene.states.menu import Menu
 from src.scene.states.pause import Pause
-from src.scene.states.stage_utils import GameStage
+from src.scene.states.stage_utils import GameState
 
 
 class StateManager:
     def __init__(self):
         self.stages = {
-            GameStage.MENU: Menu(),
-            GameStage.GAMEPLAY: Gameplay(),
-            GameStage.PAUSE: Pause(),
+            GameState.MENU: Menu(),
+            GameState.GAMEPLAY: Gameplay(),
+            GameState.PAUSE: Pause(),
         }
         self._running = True
-        self.state = self.stages[GameStage.MENU]
+        self.state = self.stages[GameState.MENU]
 
     def is_running(self):
         return not self.state.quit
@@ -24,8 +26,8 @@ class StateManager:
             self.state = self.stages[self.state.next_state]
             self.state.startup(persistent)
 
-    def render(self):
-        self.state.render()
+    def render(self, game_screen: Surface):
+        self.state.render(game_screen)
 
     def get_event(self, event):
         self.state.get_event(event)

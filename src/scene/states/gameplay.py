@@ -12,7 +12,7 @@ from src.objects.trap import Trap
 from src.objects.trigger import Trigger
 from src.scene.camera import CameraGroup
 from src.objects.tile import Tile
-from src.scene.states.stage_utils import GameStage
+from src.scene.states.stage_utils import GameState
 from src.scene.ui import UI
 from src.scene.states.state import State
 
@@ -26,7 +26,7 @@ class Gameplay(State):
         self.start_pos = (0, 0)
         self.index_map = 1
         self.corner = Vector2(Config.WIDTH, Config.HEIGHT)
-        self.next_state = GameStage.PAUSE
+        self.next_state = GameState.PAUSE
         self.is_player_died = False
         self.die_time = get_ticks()
 
@@ -40,10 +40,9 @@ class Gameplay(State):
         self.ui = UI()
 
     def startup(self, persistent: dict) -> None:
-        try:
-            self.index_map = persistent["level"]
-        except:
-            pass
+        for key, item in persistent.items():
+            if key == "level":
+                self.index_map = item
         self.on_load()
 
     def on_load(self) -> None:
@@ -164,6 +163,6 @@ class Gameplay(State):
         self.check_end()
         self.ui.update(self.carrots_count - self.found_carrots)
 
-    def render(self) -> None:
-        self.visible_sprites.custom_render()
-        self.ui.render()
+    def render(self, game_screen: Surface) -> None:
+        self.visible_sprites.custom_render(game_screen)
+        self.ui.render(game_screen)

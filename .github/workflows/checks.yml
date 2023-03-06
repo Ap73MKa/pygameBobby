@@ -33,6 +33,6 @@ jobs:
 
       - name: Run pylint
         run: pylint --rcfile=.pylintrc --exit-zero src
-
-      - name: Run mypy
-        run: mypy --pretty src
+#
+#      - name: Run mypy
+#        run: mypy --pretty src

@@ -12,11 +12,9 @@ class Trap(Sprite):
         self.image = load(
             PathManager.get("assets/graphics/objects/trap_deactivated.png")
         )
-        self.image = scale(self.image, (Config.TITLE_SIZE, Config.TITLE_SIZE))
         self.rect = self.image.get_rect(topleft=pos)
         self.activate = self.touched = False
 
     def activate_trap(self) -> None:
         self.activate = True
         self.image = load(PathManager.get("assets/graphics/objects/trap_activated.png"))
-        self.image = scale(self.image, (Config.TITLE_SIZE, Config.TITLE_SIZE))
