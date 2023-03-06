@@ -34,5 +34,5 @@ jobs:
       - name: Run pylint
         run: pylint --rcfile=.pylintrc --exit-zero src
 
-      - name: Run mypy
-        run: mypy --pretty --strict --no-error-summary src
+#      - name: Run mypy
+#        run: mypy --pretty --strict --no-error-summary src

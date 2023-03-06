@@ -1,14 +1,14 @@
 from pygame import quit as game_quit, Surface, SurfaceType
 from pygame import init, DOUBLEBUF, QUIT, display
 from pygame.display import set_caption, set_mode
-from pygame.event import get as get_event
+from pygame.event import get as events
 from pygame.time import Clock
 
 from src.misc.config import Config
-from src.scene.stages.menu import Menu
-from src.scene.stages.gameplay import Gameplay
-from src.scene.stages.pause import Pause
-from src.scene.stages.stage_utils import GameStage
+from src.scene.states.menu import Menu
+from src.scene.states.gameplay import Gameplay
+from src.scene.states.pause import Pause
+from src.scene.states.stage_utils import GameStage
 
 
 class Game:
@@ -26,8 +26,10 @@ class Game:
 
     def flip_state(self) -> None:
         self.stage.done = False
+        persistent = self.stage.persist
+        print(persistent)
         self.stage = self.stages[self.stage.next_state]
-        self.stage.startup(self.stage.persist)
+        self.stage.startup(persistent)
 
     def on_init(self) -> Surface | SurfaceType:
         init()
@@ -35,7 +37,7 @@ class Game:
         return set_mode(self.size, DOUBLEBUF)
 
     def on_event(self) -> None:
-        for event in get_event():
+        for event in events():
             self._running = not event.type == QUIT
             self.stage.get_event(event)
 

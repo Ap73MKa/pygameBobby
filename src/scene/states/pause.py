@@ -1,11 +1,11 @@
 import pygame as pg
 
 from pygame import Color
-from .base import BaseState
-from src.scene.stages.stage_utils import GameStage
+from .state import State
+from src.scene.states.stage_utils import GameStage
 
 
-class Pause(BaseState):
+class Pause(State):
     def __init__(self) -> None:
         super().__init__()
         self.title = self.font.render("Game Over", True, Color("white"))

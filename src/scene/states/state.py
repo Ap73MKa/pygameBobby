@@ -3,7 +3,7 @@ from pygame.display import get_surface
 from pygame.event import Event
 
 
-class BaseState:
+class State:
     def __init__(self) -> None:
         self.surface = get_surface()
         self.done = self.quit = False

@@ -12,12 +12,12 @@ from src.objects.trap import Trap
 from src.objects.trigger import Trigger
 from src.scene.camera import CameraGroup
 from src.objects.tile import Tile
-from src.scene.stages.stage_utils import GameStage
+from src.scene.states.stage_utils import GameStage
 from src.scene.ui import UI
-from src.scene.stages.base import BaseState
+from src.scene.states.state import State
 
 
-class Gameplay(BaseState):
+class Gameplay(State):
     def __init__(self) -> None:
         super().__init__()
         self.player: Player | None = None
@@ -39,6 +39,11 @@ class Gameplay(BaseState):
         self.traps_group = Group()
         self.ui = UI()
 
+    def startup(self, persistent: dict) -> None:
+        try:
+            self.index_map = persistent["level"]
+        except:
+            pass
         self.on_load()
 
     def on_load(self) -> None:

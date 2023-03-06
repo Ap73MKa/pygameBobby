@@ -15,13 +15,13 @@ from pygame.font import Font
 from pygame.transform import scale
 from pygame.image import load
 
-from src.scene.stages.base import BaseState
-from src.scene.stages.stage_utils import GameStage
+from src.scene.states.state import State
+from src.scene.states.stage_utils import GameStage
 from src.misc.path import PathManager
 from src.misc.config import Config
 
 
-class Menu(BaseState):
+class Menu(State):
     def __init__(self) -> None:
         super().__init__()
         self.level_index = 1
@@ -39,6 +39,10 @@ class Menu(BaseState):
             "Quit",
         ]
         self.next_state = GameStage.GAMEPLAY
+        self.persist = {}
+
+    def __str__(self):
+        return "menu"
 
     def render_text(self, index, custom_color=None) -> Surface | SurfaceType:
         color = (
@@ -58,6 +62,7 @@ class Menu(BaseState):
         if self.active_index == 0:
             self.done = True
         if self.active_index == 1:
+            self.persist = {"level": self.level_index}
             self.done = True
         elif self.active_index == 3:
             self.quit = True
