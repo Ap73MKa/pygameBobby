@@ -1,9 +1,9 @@
 from pygame import Surface
 
-from src.scene.states.gameplay import Gameplay
-from src.scene.states.menu import Menu
-from src.scene.states.pause import Pause
-from src.scene.states.stage_utils import GameState
+from .gameplay import Gameplay
+from .menu import Menu
+from .pause import Pause
+from .state import GameState
 
 
 class StateManager:

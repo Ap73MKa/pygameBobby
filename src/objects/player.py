@@ -5,9 +5,7 @@ from pygame.key import get_pressed
 from pygame.sprite import Sprite, Group
 from pygame.time import get_ticks
 
-from src.misc.config import Config
-from src.misc.path import PathManager
-from src.misc.spritesheet import SpriteSheet
+from src.misc import Config, PathManager, SpriteSheet
 
 
 class AnimEnum(IntEnum):

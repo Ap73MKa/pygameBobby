@@ -2,8 +2,8 @@ from pygame import Surface
 from pygame.sprite import Sprite, Group
 from pygame.math import Vector2
 
-from src.objects.player import Player
-from src.misc.config import Config
+from src.objects import Player
+from src.misc import Config
 
 
 class CameraGroup(Group):

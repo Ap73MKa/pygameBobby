@@ -3,7 +3,7 @@ from pygame.font import Font
 from pygame.display import get_surface
 from pygame.event import Event
 
-from src.scene.states.stage_utils import GameState
+from .stage_utils import GameState
 
 
 class State:

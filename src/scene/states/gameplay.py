@@ -5,16 +5,12 @@ from pygame.display import get_surface
 from pygame.sprite import Group
 from pygame.time import get_ticks
 
-from src.misc.config import Config
-from src.misc.path import PathManager
-from src.objects.player import Player
-from src.objects.trap import Trap
-from src.objects.trigger import Trigger
-from src.scene.camera import CameraGroup
-from src.objects.tile import Tile
-from src.scene.states.stage_utils import GameState
+from src.misc import Config, PathManager
+from src.objects import Carrot, Player, Trap, Trigger, Tile
 from src.scene.ui import UI
-from src.scene.states.state import State
+from src.scene.camera import CameraGroup
+from .stage_utils import GameState
+from .state import State
 
 
 class Gameplay(State):
@@ -106,7 +102,7 @@ class Gameplay(State):
             for x, y, surf in layer.tiles():
                 self.carrots_count += 1
                 pos = (x * Config.TITLE_SIZE, y * Config.TITLE_SIZE)
-                Tile(pos, surf, [self.carrots_group, self.visible_sprites])
+                Carrot(pos, [self.carrots_group, self.visible_sprites])
 
         layer = self.tmx_data.get_layer_by_name("trap")
         if hasattr(layer, "data"):
@@ -127,9 +123,9 @@ class Gameplay(State):
             self.on_load()
 
         for carrot in self.carrots_group:
-            if carrot.rect.topleft == self.player.pos:
+            if carrot.rect.topleft == self.player.pos and not carrot.activated:
                 self.found_carrots += 1
-                carrot.kill()
+                carrot.activate()
 
         for trap in self.traps_group:
             if trap.rect.topleft == self.player.pos:
@@ -153,8 +149,10 @@ class Gameplay(State):
             trigger.activate()
 
     def get_event(self, e) -> None:
-        self.done = e.type == KEYUP and e.key == K_ESCAPE
         self.quit = e.type == QUIT
+        if e.type == KEYUP and e.key == K_ESCAPE:
+            self.next_state = GameState.PAUSE
+            self.done = True
 
     def update(self, delta: float) -> None:
         self.check_collide()

@@ -1,8 +1,6 @@
 from pygame.sprite import Group, Sprite
-from pygame.transform import scale
 
-from src.misc.path import PathManager
-from src.misc.spritesheet import SpriteSheet
+from src.misc import PathManager, SpriteSheet
 
 
 class Trigger(Sprite):
@@ -18,7 +16,8 @@ class Trigger(Sprite):
         self.activated = False
 
     def activate(self):
-        self.activated = True
+        if not self.activated:
+            self.activated = True
 
     def animate(self, delta: float):
         self.frame += self.frame_speed * delta / 2

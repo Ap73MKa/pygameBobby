@@ -5,8 +5,8 @@ from pygame.event import get as events
 from pygame.time import Clock
 from pygame.transform import scale
 
-from src.misc.config import Config
-from src.scene.states.state_manager import StateManager
+from src.misc import Config
+from src.scene import StateManager
 
 
 class Game:

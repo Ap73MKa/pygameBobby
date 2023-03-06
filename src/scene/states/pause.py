@@ -6,8 +6,7 @@ from pygame.image import load
 
 from .state import State
 from src.scene.states.stage_utils import GameState
-from src.misc.config import Config
-from src.misc.path import PathManager
+from src.misc import Config, PathManager
 
 
 class Pause(State):

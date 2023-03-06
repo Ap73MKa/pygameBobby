@@ -1,8 +1,7 @@
 import pygame.display
 from pygame import Surface
 
-from src.misc.config import Config
-from src.misc.path import PathManager
+from src.misc import Config, PathManager
 
 
 class UI:

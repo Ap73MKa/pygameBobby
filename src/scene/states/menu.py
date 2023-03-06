@@ -14,10 +14,9 @@ from pygame import (
 from pygame.font import Font
 from pygame.image import load
 
-from src.scene.states.state import State
-from src.scene.states.stage_utils import GameState
-from src.misc.path import PathManager
-from src.misc.config import Config
+from src.misc import PathManager, Config
+from .state import State
+from .stage_utils import GameState
 
 
 class Menu(State):
