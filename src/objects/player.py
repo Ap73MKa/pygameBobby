@@ -21,7 +21,9 @@ class AnimEnum(IntEnum):
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, group: pygame.sprite.Group, collision_group: pygame.sprite.Group):
+    def __init__(
+        self, pos, group: pygame.sprite.Group, collision_group: pygame.sprite.Group
+    ):
         super().__init__(group)
         # animation
         self.frame = 0
@@ -33,25 +35,37 @@ class Player(pygame.sprite.Sprite):
 
         # movement
         image_size = self.image.get_size()
-        self.image_offset = Vector2(image_size[0] - Config.TITLE_SIZE, image_size[1] - Config.TITLE_SIZE)
-        self.rect = self.image.get_rect(center=pos).inflate(-self.image_offset.x, -self.image_offset.y)
+        self.image_offset = Vector2(
+            image_size[0] - Config.TITLE_SIZE, image_size[1] - Config.TITLE_SIZE
+        )
+        self.rect = self.image.get_rect(center=pos).inflate(
+            -self.image_offset.x, -self.image_offset.y
+        )
         self.pos = Vector2(self.rect.center)
         self.target_pos = Vector2(self.rect.center)
         self.direction = Vector2()
         self.move_speed = 4
-        self.dx = self.dy = 0
+        self.dx = self.dy = .0
 
         self.inactive_start = pygame.time.get_ticks()
         self.collision_group = collision_group
 
     @staticmethod
     def upscale(sprite_sheet: SpriteSheet):
-        return [scale(image, (image.get_size()[0] * 3, image.get_size()[1] * 3)) for image in sprite_sheet[0]]
+        return [
+            scale(image, (image.get_size()[0] * 3, image.get_size()[1] * 3))
+            for image in sprite_sheet[0]
+        ]
 
     def import_animations(self):
-        anim_names = 'right down left up idle fading dying'.strip().split()
-        anim_path = 'assets/graphics/player'
-        return [self.upscale(SpriteSheet(PathManager.get(f'{anim_path}/{anim}.png'), (18, 25))) for anim in anim_names]
+        anim_names = "right down left up idle fading dying".strip().split()
+        anim_path = "assets/graphics/player"
+        return [
+            self.upscale(
+                SpriteSheet(PathManager.get(f"{anim_path}/{anim}.png"), (18, 25))
+            )
+            for anim in anim_names
+        ]
 
     def input(self):
         if not (self.is_target_pos() and self.dx == self.dy == 0):
@@ -81,7 +95,10 @@ class Player(pygame.sprite.Sprite):
             self.target_pos += self.direction * Config.TITLE_SIZE
 
     def is_target_pos(self) -> bool:
-        return abs(self.pos.x - self.target_pos.x) <= 2 and abs(self.pos.y - self.target_pos.y) <= 2
+        return (
+            abs(self.pos.x - self.target_pos.x) <= 2
+            and abs(self.pos.y - self.target_pos.y) <= 2
+        )
 
     def move(self, delta: float):
         if self.dx != 0 or self.dy != 0:
@@ -94,7 +111,9 @@ class Player(pygame.sprite.Sprite):
         else:
             self.dx = (self.target_pos.x - self.pos.x) / self.move_speed * delta * 10
             self.dy = (self.target_pos.y - self.pos.y) / self.move_speed * delta * 10
-        self.rect.topleft = Vector2(self.pos.x - self.image_offset.x // 2, self.pos.y - self.image_offset.y)
+        self.rect.topleft = Vector2(
+            self.pos.x - self.image_offset.x // 2, self.pos.y - self.image_offset.y
+        )
 
     def animate(self, delta):
         animation = self.sprites[self.anim_state]

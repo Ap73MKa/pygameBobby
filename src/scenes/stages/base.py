@@ -1,6 +1,7 @@
 from pygame.font import Font
 from pygame.display import get_surface
 from pygame import event
+from pygame.event import Event
 
 
 class BaseState:
@@ -15,7 +16,7 @@ class BaseState:
     def startup(self, persistent):
         self.persist = persistent
 
-    def get_event(self, event: event):
+    def get_event(self, e: Event):
         pass
 
     def update(self, delta: float):

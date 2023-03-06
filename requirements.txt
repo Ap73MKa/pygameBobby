@@ -1,2 +1,6 @@
 pygame~=2.2.0
 PyTMX~=3.31
+
+black~=23.1.0
+pylint~=2.16.3
+mypy~=1.0.1

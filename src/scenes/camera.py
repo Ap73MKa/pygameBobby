@@ -15,8 +15,14 @@ class CameraGroup(Group):
         self.offset = Vector2()
 
     def is_visible(self, sprite: Sprite) -> bool:
-        return self.size.y + self.offset.y > sprite.rect.y > -Config.TITLE_SIZE - self.offset.y and \
-                self.size.x + self.offset.x > sprite.rect.x > -Config.TITLE_SIZE - self.offset.x
+        return (
+            self.size.y + self.offset.y
+            > sprite.rect.y
+            > -Config.TITLE_SIZE - self.offset.y
+            and self.size.x + self.offset.x
+            > sprite.rect.x
+            > -Config.TITLE_SIZE - self.offset.x
+        )
 
     def custom_update(self, player: Player, corner: Vector2, delta: float):
         heading = player.rect.center - self.camera
@@ -32,7 +38,7 @@ class CameraGroup(Group):
         self.offset.y = round(self.offset.y)
 
     def custom_render(self):
-        self.display_surface.fill('black')
+        self.display_surface.fill("black")
         for sprite in self.sprites():
             if not self.is_visible(sprite):
                 continue

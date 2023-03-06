@@ -8,24 +8,27 @@ from src.scenes.stages.stage_utils import GameStage
 class Pause(BaseState):
     def __init__(self):
         super().__init__()
-        self.title = self.font.render('Game Over', True, Color('white'))
+        self.title = self.font.render("Game Over", True, Color("white"))
         self.title_rect = self.title.get_rect(center=self.screen_rect.center)
-        text = 'Press space to start again, or enter to go to the menu'
-        self.instructions = self.font.render(text, True, Color('white'))
-        instructions_center = (self.screen_rect.center[0], self.screen_rect.center[1] + 50)
+        text = "Press space to start again, or enter to go to the menu"
+        self.instructions = self.font.render(text, True, Color("white"))
+        instructions_center = (
+            self.screen_rect.center[0],
+            self.screen_rect.center[1] + 50,
+        )
         self.instructions_rect = self.instructions.get_rect(center=instructions_center)
 
-    def get_event(self, event):
-        if event.type == pg.QUIT:
+    def get_event(self, e):
+        if e.type == pg.QUIT:
             self.quit = True
-        elif event.type == pg.KEYUP:
-            if event.key == pg.K_RETURN:
+        elif e.type == pg.KEYUP:
+            if e.key == pg.K_RETURN:
                 self.next_state = GameStage.MENU
                 self.done = True
-            elif event.key == pg.K_SPACE:
+            elif e.key == pg.K_SPACE:
                 self.next_state = GameStage.GAMEPLAY
                 self.done = True
-            elif event.key == pg.K_ESCAPE:
+            elif e.key == pg.K_ESCAPE:
                 self.quit = True
 
     def render(self):

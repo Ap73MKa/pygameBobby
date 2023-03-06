@@ -18,5 +18,7 @@ class Trap(Sprite):
 
     def activate_trap(self):
         self.activate = True
-        self.image = pygame.image.load(PathManager.get('assets/graphics/objects/trap_activated.png'))
+        self.image = pygame.image.load(
+            PathManager.get("assets/graphics/objects/trap_activated.png")
+        )
         self.image = scale(self.image, (Config.TITLE_SIZE, Config.TITLE_SIZE))

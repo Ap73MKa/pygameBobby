@@ -1,6 +1,6 @@
 import pygame as pg
 
-from misc.config import Config
+from src.misc.config import Config
 from src.scenes.stages.menu import Menu
 from src.scenes.stages.gameplay import Gameplay
 from src.scenes.stages.pause import Pause
@@ -16,7 +16,8 @@ class Game:
         self.stages = {
             GameStage.MENU: Menu(),
             GameStage.GAMEPLAY: Gameplay(),
-            GameStage.PAUSE: Pause()}
+            GameStage.PAUSE: Pause(),
+        }
         self.stage = self.stages[GameStage.MENU]
 
     def flip_state(self):
@@ -26,7 +27,7 @@ class Game:
 
     def on_init(self):
         pg.init()
-        pg.display.set_caption('Bobby Carrot')
+        pg.display.set_caption("Bobby Carrot")
         return pg.display.set_mode(self.size, pg.DOUBLEBUF)
 
     def on_event(self):
@@ -55,6 +56,6 @@ class Game:
         pg.quit()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     game = Game()
     game.on_execute()
