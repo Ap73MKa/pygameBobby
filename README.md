@@ -30,5 +30,5 @@ pip install -r requirements.txt
 ```
 5. Run a game
 ```bash
-python -m src
+python -m game
 ```

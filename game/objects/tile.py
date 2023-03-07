@@ -2,7 +2,7 @@ from pygame import Surface
 from pygame.sprite import Sprite, Group
 from pygame.transform import scale
 
-from src.misc import Config
+from game.misc import Config
 
 
 class Tile(Sprite):

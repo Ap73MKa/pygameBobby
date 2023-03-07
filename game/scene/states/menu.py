@@ -14,7 +14,7 @@ from pygame import (
 from pygame.font import Font
 from pygame.image import load
 
-from src.misc import PathManager, Config
+from game.misc import PathManager, Config
 from .state import State
 from .stage_utils import GameState
 

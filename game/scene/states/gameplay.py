@@ -5,10 +5,10 @@ from pygame.display import get_surface
 from pygame.sprite import Group
 from pygame.time import get_ticks
 
-from src.misc import Config, PathManager
-from src.objects import Carrot, Player, Trap, Trigger, Tile
-from src.scene.ui import UI
-from src.scene.camera import CameraGroup
+from game.misc import Config, PathManager
+from game.objects import Carrot, Player, Trap, Trigger, Tile
+from game.scene.ui import UI
+from game.scene.camera import CameraGroup
 from .stage_utils import GameState
 from .state import State
 from ...objects.player import AnimEnum

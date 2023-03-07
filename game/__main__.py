@@ -6,8 +6,8 @@ from pygame.image import load
 from pygame.time import Clock
 from pygame.transform import scale
 
-from src.misc import Config, PathManager
-from src.scene import StateManager
+from game.misc import Config, PathManager
+from game.scene import StateManager
 
 
 class Game:
@@ -22,7 +22,7 @@ class Game:
     def on_init(self) -> Surface | SurfaceType:
         pg.init()
         set_caption("Bobby Carrot")
-        set_icon(load(PathManager.get('assets/graphics/icon.png')))
+        set_icon(load(PathManager.get("assets/graphics/icon.png")))
         return set_mode(self.size, pg.DOUBLEBUF)
 
     def on_event(self) -> None:

@@ -2,9 +2,9 @@ import pygame as pg
 from pygame import Surface
 from pygame.font import Font
 
-from . import GameState
+from game.misc import PathManager, Config
+from .stage_utils import GameState
 from .state import State
-from src.misc import PathManager, Config
 
 
 class LevelTransition(State):

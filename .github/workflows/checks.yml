@@ -28,11 +28,11 @@ jobs:
         uses: psf/black@stable
         with:
           options: "--check --verbose --diff"
-          src: "./src"
+          src: "./game"
           jupyter: true
 
       - name: Run pylint
-        run: pylint --rcfile=.pylintrc --exit-zero src
+        run: pylint --rcfile=.pylintrc --exit-zero game
 #
 #      - name: Run mypy
 #        run: mypy --pretty src

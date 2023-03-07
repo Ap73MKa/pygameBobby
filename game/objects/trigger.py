@@ -1,6 +1,6 @@
 from pygame.sprite import Group, Sprite
 
-from src.misc import PathManager, SpriteSheet
+from game.misc import PathManager, SpriteSheet
 
 
 class Trigger(Sprite):

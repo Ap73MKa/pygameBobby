@@ -1,12 +1,12 @@
 import pygame as pg
 
-from pygame import Color, Surface, SurfaceType, Rect, draw
+from pygame import Color, Surface, SurfaceType, Rect
 from pygame.font import Font
 from pygame.image import load
 
+from game.misc import Config, PathManager
 from .state import State
-from src.scene.states.stage_utils import GameState
-from src.misc import Config, PathManager
+from .stage_utils import GameState
 
 
 class Pause(State):
@@ -26,6 +26,7 @@ class Pause(State):
 
     def handle_action(self) -> None:
         if self.active_index == 0:
+            self.persist = {"reload": False}
             self.next_state = GameState.GAMEPLAY
             self.done = True
         if self.active_index == 1:

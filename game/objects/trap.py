@@ -1,7 +1,7 @@
 from pygame.image import load
 from pygame.sprite import Group, Sprite
 
-from src.misc import PathManager
+from game.misc import PathManager
 
 
 class Trap(Sprite):
