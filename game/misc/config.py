@@ -10,4 +10,4 @@ class Config(ABC):
     HEIGHT: Final = TITLE_SIZE * 12
     W_WIDTH: Final = WIDTH * SCALE
     W_HEIGHT: Final = HEIGHT * SCALE
-    MAX_LEVEL: Final = 6
+    MAX_LEVEL: Final = 7
