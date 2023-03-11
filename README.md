@@ -1,5 +1,6 @@
 # Bobby Carrot
 
+[![CodeFactor](https://www.codefactor.io/repository/github/ap73mka/pygamebobby/badge)](https://www.codefactor.io/repository/github/ap73mka/pygamebobby)
 ![](https://badgen.net/github/checks/ap73mka/pygameBobby)
 ![](https://badgen.net/github/release/ap73mka/pygameBobby)
 ![](https://badgen.net/badge/Licence/MIT/blue)

@@ -5,6 +5,7 @@ from pygame.event import get as events
 from pygame.image import load
 from pygame.time import Clock
 from pygame.transform import scale
+from pygame import mixer
 
 from game.misc import Config, PathManager
 from game.scene import StateManager
@@ -18,6 +19,8 @@ class Game:
         self.screen = self.on_init()
         self.manager = StateManager()
         self.clock = Clock()
+        mixer.music.load(PathManager.get('assets/sounds/background_music.mp3'))
+        mixer.music.play(-1)
 
     def on_init(self) -> Surface | SurfaceType:
         pg.init()
