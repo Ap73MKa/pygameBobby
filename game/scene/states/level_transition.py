@@ -48,9 +48,9 @@ class LevelTransition(State):
             game_screen.blit(dark, (0, 0))
 
         game_screen.blit(
-            self.font.render("SUCCESS", False, (0, 0, 0)), (80 + 1, 60 + 1)
+            self.font.render("SUCCESS", False, (0, 0, 0)), (85 + 1, 50 + 1)
         )
-        game_screen.blit(self.font.render("SUCCESS", False, (255, 255, 255)), (80, 60))
+        game_screen.blit(self.font.render("SUCCESS", False, (255, 255, 255)), (85, 50))
 
         game_screen.blit(
             self.font.render(f"Time: {self.time}", False, (0, 0, 0)), (80 + 1, 80 + 1)
@@ -61,17 +61,17 @@ class LevelTransition(State):
 
         game_screen.blit(
             self.font.render(f"Steps: {self.steps}", False, (0, 0, 0)),
-            (80 + 1, 100 + 1),
+            (85 + 1, 100 + 1),
         )
         game_screen.blit(
-            self.font.render(f"Steps: {self.steps}", False, (255, 255, 255)), (80, 100)
+            self.font.render(f"Steps: {self.steps}", False, (255, 255, 255)), (85, 100)
         )
 
         game_screen.blit(
             self.font.render("Press any key to continue", False, (0, 0, 0)),
-            (40 + 1, 120 + 1),
+            (30 + 1, 120 + 1),
         )
         game_screen.blit(
             self.font.render("Press any key to continue", False, (255, 255, 255)),
-            (40, 120),
+            (30, 120),
         )

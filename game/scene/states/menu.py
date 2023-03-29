@@ -10,13 +10,17 @@ from pygame import (
     Surface,
     SurfaceType,
     Rect,
+    mixer,
 )
 from pygame.font import Font
 from pygame.image import load
+from pytmx import load_pygame
+from pygame.sprite import Group
 
 from game.misc import PathManager, Config
 from .state import State
 from .stage_utils import GameState
+from ...objects import Tile, Water
 
 
 class Menu(State):
@@ -25,6 +29,9 @@ class Menu(State):
         self.level_index = 1
         self.bg_tile = load(PathManager.get("assets/graphics/hud/grass.png")).convert()
         self.font = Font(PathManager.get("assets/graphics/hud/font.ttf"), 10)
+        self.tmx_data = load_pygame(PathManager.get(f"assets/maps/menu.tmx"))
+        self.menu_sound = mixer.Sound(PathManager.get("assets/sounds/menu_sound.wav"))
+        self.visible_sprites = Group()
         self.center = (Config.WIDTH // 2, Config.HEIGHT // 2)
         self.active_index = 0
         self.options = [
@@ -35,21 +42,36 @@ class Menu(State):
         self.next_state = GameState.GAMEPLAY
         self.persist = {}
 
-    def __str__(self):
-        return "menu"
+        self.on_load()
+
+    def on_load(self):
+        self.visible_sprites.empty()
+
+        layer = self.tmx_data.get_layer_by_name("background")
+        if hasattr(layer, "data"):
+            for x, y, surf in layer.tiles():
+                pos = (x * Config.TITLE_SIZE, y * Config.TITLE_SIZE)
+                Water(pos, [self.visible_sprites])
+
+        for layer in self.tmx_data.visible_layers:
+            if not hasattr(layer, "data"):
+                break
+            for x, y, surf in layer.tiles():
+                pos = (x * Config.TITLE_SIZE, y * Config.TITLE_SIZE)
+                Tile(pos, surf, [self.visible_sprites])
 
     def render_text(self, index, custom_color=None) -> Surface | SurfaceType:
         color = (
             Color((255, 255, 255))
             if index == self.active_index
-            else Color((100, 100, 100))
+            else Color((150, 150, 150))
         )
         return self.font.render(
             self.options[index], False, custom_color if custom_color else color
         )
 
     def get_text_position(self, text, index) -> Rect:
-        center = (self.center[0], self.center[1] + (index * 20))
+        center = (self.center[0], self.center[1] - 10 + (index * 20))
         return text.get_rect(center=center)
 
     def handle_action(self) -> None:
@@ -89,23 +111,19 @@ class Menu(State):
             elif e.key == K_LEFT and self.active_index == 1:
                 self.handle_level_index(-1)
             elif e.key == K_RETURN:
+                self.menu_sound.play()
                 self.handle_action()
 
+    def update(self, delta: float) -> None:
+        self.visible_sprites.update(delta)
+
     def render(self, game_screen: Surface) -> None:
-        for x in range(Config.WIDTH // Config.TITLE_SIZE):
-            for y in range(Config.HEIGHT // Config.TITLE_SIZE):
-                game_screen.blit(
-                    self.bg_tile, (x * Config.TITLE_SIZE, y * Config.TITLE_SIZE)
-                )
-        dark = Surface((Config.WIDTH, Config.HEIGHT))
-        dark.fill((0, 0, 0))
-        dark.set_alpha(100)
-        game_screen.blit(dark, (0, 0))
+        self.visible_sprites.draw(game_screen)
         game_screen.blit(
-            self.font.render("Bobby Carrot", False, (0, 0, 0)), (75 + 1, 60 + 1)
+            self.font.render("Bobby Carrot", False, (0, 0, 0)), (75 + 1, 55 + 1)
         )
         game_screen.blit(
-            self.font.render("Bobby Carrot", False, (255, 255, 255)), (75, 60)
+            self.font.render("Bobby Carrot", False, (255, 255, 255)), (75, 55)
         )
         for index, _ in enumerate(self.options):
             text_render = self.render_text(index, (0, 0, 0))

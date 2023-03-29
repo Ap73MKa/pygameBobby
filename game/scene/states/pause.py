@@ -1,6 +1,6 @@
 import pygame as pg
 
-from pygame import Color, Surface, SurfaceType, Rect
+from pygame import Color, Surface, SurfaceType, Rect, mixer
 from pygame.font import Font
 from pygame.image import load
 
@@ -17,6 +17,7 @@ class Pause(State):
         self.center = (Config.WIDTH // 2, Config.HEIGHT // 2)
         self.active_index = 0
         self.options = ["Continue", "Reload level", "Back to menu", "Exit"]
+        self.menu_sound = mixer.Sound(PathManager.get("assets/sounds/menu_sound.wav"))
         self.is_drawn_once = False
         self.persist = {}
 
@@ -54,6 +55,7 @@ class Pause(State):
             elif e.key == pg.K_DOWN:
                 self.handle_option_index(1)
             elif e.key == pg.K_RETURN:
+                self.menu_sound.play()
                 self.handle_action()
 
     def render_text(self, index, custom_color=None) -> Surface | SurfaceType:
@@ -67,7 +69,7 @@ class Pause(State):
         )
 
     def get_text_position(self, text, index) -> Rect:
-        center = (self.center[0], self.center[1] + (index * 20))
+        center = (self.center[0], self.center[1] - 30 + (index * 20))
         return text.get_rect(center=center)
 
     def render(self, game_screen: Surface) -> None:

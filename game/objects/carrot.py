@@ -13,7 +13,5 @@ class Carrot(Sprite):
 
     def activate(self) -> None:
         if not self.activated:
-            self.image = load(
-                PathManager.get("assets/graphics/objects/carrot_hole.png")
-            )
+            self.image = load(PathManager.get("assets/graphics/objects/hole.png"))
             self.activated = True

@@ -1,9 +1,8 @@
 from enum import IntEnum, auto
 
-from pygame import Vector2, K_UP, K_w, K_DOWN, K_s, K_LEFT, K_l, K_RIGHT, K_r
+from pygame import Vector2, K_UP, K_w, K_DOWN, K_s, K_LEFT, K_RIGHT, K_a, K_d
 from pygame.key import get_pressed
 from pygame.sprite import Sprite, Group
-from pygame.time import get_ticks
 
 from game.misc import Config, PathManager, SpriteSheet
 
@@ -13,10 +12,14 @@ class AnimEnum(IntEnum):
     DOWN = auto()
     LEFT = auto()
     UP = auto()
-    IDLE = auto()
     DYING = auto()
-    FADING = auto()
-    UNFADING = auto()
+
+
+class IdleAnimEnum(IntEnum):
+    RIGHT = 0
+    DOWN = auto()
+    LEFT = auto()
+    UP = auto()
 
 
 class Player(Sprite):
@@ -24,11 +27,16 @@ class Player(Sprite):
         super().__init__(group)
         # animation
         self.frame = 0
-        self.frame_speed = 35
-        self.anim_state: AnimEnum = AnimEnum.UNFADING
+        self.frame_speed = 20
+        self.anim_state: AnimEnum = AnimEnum.DOWN
         self.is_inactive = False
-        self.sprites = self.import_animations()
-        self.image = self.sprites[AnimEnum.UNFADING][self.frame]
+        self.sprites = SpriteSheet(
+            PathManager.get("assets/graphics/player/walk.png"), (16, 17)
+        )
+        self.idle_sprites = SpriteSheet(
+            PathManager.get("assets/graphics/player/idle.png"), (16, 17)
+        )
+        self.image = self.sprites[self.anim_state][self.frame]
 
         # movement
         image_size = self.image.get_size()
@@ -41,30 +49,18 @@ class Player(Sprite):
         self.pos = Vector2(self.rect.center)
         self.target_pos = Vector2(self.rect.center)
         self.direction = Vector2()
-        self.move_speed = 4
+        self.move_speed = 6
         self.dx = self.dy = 0.0
 
         self.is_dying = False
-        self.inactive_start = get_ticks()
         self.collision_group = collision_group
         self.step_count = 0
 
-    @staticmethod
-    def import_animations():
-        anim_names = "right down left up idle dying fading unfading".strip().split()
-        anim_path = "assets/graphics/player"
-        return [
-            SpriteSheet(
-                PathManager.get(f"{anim_path}/{anim}.png"),
-                (18, 25) if anim != "dying" else (22, 27),
-            )[0]
-            for anim in anim_names
-        ]
-
     def input(self):
-        if not (
-            self.is_target_pos() and self.dx == self.dy == 0
-        ) or self.anim_state in [AnimEnum.DYING, AnimEnum.FADING]:
+        if (
+            not (self.is_target_pos() and self.dx == self.dy == 0)
+            or self.anim_state == AnimEnum.DYING
+        ):
             return
 
         keys = get_pressed()
@@ -78,10 +74,10 @@ class Player(Sprite):
         else:
             self.direction.y = 0
 
-        if keys[K_LEFT] or keys[K_l]:
+        if keys[K_LEFT] or keys[K_a]:
             self.direction.x = -1
             self.anim_state = AnimEnum.LEFT
-        elif keys[K_RIGHT] or keys[K_r]:
+        elif keys[K_RIGHT] or keys[K_d]:
             self.direction.x = 1
             self.anim_state = AnimEnum.RIGHT
         else:
@@ -95,8 +91,8 @@ class Player(Sprite):
 
     def is_target_pos(self) -> bool:
         return (
-            abs(self.pos.x - self.target_pos.x) <= 2
-            and abs(self.pos.y - self.target_pos.y) <= 2
+            abs(self.pos.x - self.target_pos.x) <= 1
+            and abs(self.pos.y - self.target_pos.y) <= 1
         )
 
     def get_step_count(self):
@@ -122,21 +118,11 @@ class Player(Sprite):
     def animate(self, delta):
         animation = self.sprites[self.anim_state]
         self.frame += self.frame_speed * delta / 2
-        if self.is_inactive and self.anim_state not in [
-            AnimEnum.IDLE,
-            AnimEnum.DYING,
-            AnimEnum.FADING,
-            AnimEnum.UNFADING,
-        ]:
-            self.frame = 0
-            self.image = animation[self.frame]
-            return
+        if self.is_inactive and self.anim_state != AnimEnum.DYING:
+            animation = self.idle_sprites[self.anim_state]
         if self.frame >= len(animation):
-            if self.anim_state in [AnimEnum.DYING, AnimEnum.FADING]:
+            if self.anim_state == AnimEnum.DYING:
                 self.frame = len(animation) - 1
-            elif self.anim_state == AnimEnum.UNFADING:
-                self.frame = 0
-                self.anim_state = AnimEnum.DOWN
             else:
                 self.frame = 0
         self.image = animation[int(self.frame)]
@@ -156,12 +142,7 @@ class Player(Sprite):
                 self.target_pos = self.pos.copy()
 
     def check_inactive(self):
-        self.is_inactive = True if self.direction == self.direction * 0 else False
-        if not self.is_inactive:
-            self.inactive_start = get_ticks()
-            return
-        if get_ticks() - self.inactive_start >= 8000:
-            self.anim_state = AnimEnum.IDLE
+        self.is_inactive = self.direction == self.direction * 0
 
     def update(self, delta: float):
         self.input()
