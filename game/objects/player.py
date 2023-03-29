@@ -30,8 +30,12 @@ class Player(Sprite):
         self.frame_speed = 20
         self.anim_state: AnimEnum = AnimEnum.DOWN
         self.is_inactive = False
-        self.sprites = SpriteSheet(PathManager.get('assets/graphics/player/walk.png'), (16, 17))
-        self.idle_sprites = SpriteSheet(PathManager.get('assets/graphics/player/idle.png'), (16, 17))
+        self.sprites = SpriteSheet(
+            PathManager.get("assets/graphics/player/walk.png"), (16, 17)
+        )
+        self.idle_sprites = SpriteSheet(
+            PathManager.get("assets/graphics/player/idle.png"), (16, 17)
+        )
         self.image = self.sprites[self.anim_state][self.frame]
 
         # movement
@@ -53,9 +57,10 @@ class Player(Sprite):
         self.step_count = 0
 
     def input(self):
-        if not (
-            self.is_target_pos() and self.dx == self.dy == 0
-        ) or self.anim_state == AnimEnum.DYING:
+        if (
+            not (self.is_target_pos() and self.dx == self.dy == 0)
+            or self.anim_state == AnimEnum.DYING
+        ):
             return
 
         keys = get_pressed()

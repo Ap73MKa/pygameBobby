@@ -9,7 +9,8 @@ from pygame import (
     K_RETURN,
     Surface,
     SurfaceType,
-    Rect, mixer,
+    Rect,
+    mixer,
 )
 from pygame.font import Font
 from pygame.image import load
@@ -29,7 +30,7 @@ class Menu(State):
         self.bg_tile = load(PathManager.get("assets/graphics/hud/grass.png")).convert()
         self.font = Font(PathManager.get("assets/graphics/hud/font.ttf"), 10)
         self.tmx_data = load_pygame(PathManager.get(f"assets/maps/menu.tmx"))
-        self.menu_sound = mixer.Sound(PathManager.get('assets/sounds/menu_sound.wav'))
+        self.menu_sound = mixer.Sound(PathManager.get("assets/sounds/menu_sound.wav"))
         self.visible_sprites = Group()
         self.center = (Config.WIDTH // 2, Config.HEIGHT // 2)
         self.active_index = 0
@@ -42,9 +43,6 @@ class Menu(State):
         self.persist = {}
 
         self.on_load()
-
-    def __str__(self):
-        return "menu"
 
     def on_load(self):
         self.visible_sprites.empty()

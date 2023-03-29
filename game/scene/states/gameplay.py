@@ -37,10 +37,12 @@ class Gameplay(State):
         self.ui = UI()
 
         # Sounds
-        self.carrot_sound = mixer.Sound(PathManager.get('assets/sounds/carrot_pickup.wav'))
-        self.exit_sound = mixer.Sound(PathManager.get('assets/sounds/exit_sound.wav'))
-        self.hit_sound = mixer.Sound(PathManager.get('assets/sounds/hit_sound.wav'))
-        self.spawn_sound = mixer.Sound(PathManager.get('assets/sounds/spawn_sound.wav'))
+        self.carrot_sound = mixer.Sound(
+            PathManager.get("assets/sounds/carrot_pickup.wav")
+        )
+        self.exit_sound = mixer.Sound(PathManager.get("assets/sounds/exit_sound.wav"))
+        self.hit_sound = mixer.Sound(PathManager.get("assets/sounds/hit_sound.wav"))
+        self.spawn_sound = mixer.Sound(PathManager.get("assets/sounds/spawn_sound.wav"))
 
         self.on_load()
 
@@ -106,7 +108,9 @@ class Gameplay(State):
         if hasattr(layer, "data"):
             for x, y, surf in layer.tiles():
                 pos = (x * Config.TITLE_SIZE, y * Config.TITLE_SIZE)
-                surf = load(PathManager.get("assets/graphics/objects/spawn_trigger.png"))
+                surf = load(
+                    PathManager.get("assets/graphics/objects/spawn_trigger.png")
+                )
                 Tile(pos, surf, [self.visible_sprites])
                 self.start_pos = pos
 

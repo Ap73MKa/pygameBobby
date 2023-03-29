@@ -10,7 +10,9 @@ class Trigger(Sprite):
         self.sprites = SpriteSheet(
             PathManager.get("assets/graphics/objects/exit_trigger.png"), (16, 16)
         )[0]
-        self.open_exit_sound = mixer.Sound(PathManager.get('assets/sounds/open_exit.wav'))
+        self.open_exit_sound = mixer.Sound(
+            PathManager.get("assets/sounds/open_exit.wav")
+        )
         self.frame = 0.0
         self.frame_speed = 15
         self.image = self.sprites[int(self.frame)]

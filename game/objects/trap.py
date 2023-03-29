@@ -11,7 +11,7 @@ class Trap(Sprite):
         self.image = load(
             PathManager.get("assets/graphics/objects/trap_deactivated.png")
         )
-        self.open_trap = mixer.Sound(PathManager.get('assets/sounds/open_trap.wav'))
+        self.open_trap = mixer.Sound(PathManager.get("assets/sounds/open_trap.wav"))
         self.rect = self.image.get_rect(topleft=pos)
         self.activate = self.touched = False
 

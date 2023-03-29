@@ -17,7 +17,7 @@ class Pause(State):
         self.center = (Config.WIDTH // 2, Config.HEIGHT // 2)
         self.active_index = 0
         self.options = ["Continue", "Reload level", "Back to menu", "Exit"]
-        self.menu_sound = mixer.Sound(PathManager.get('assets/sounds/menu_sound.wav'))
+        self.menu_sound = mixer.Sound(PathManager.get("assets/sounds/menu_sound.wav"))
         self.is_drawn_once = False
         self.persist = {}
 
