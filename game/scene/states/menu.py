@@ -17,7 +17,7 @@ from pygame.image import load
 from pytmx import load_pygame
 from pygame.sprite import Group
 
-from game.misc import PathManager, Config
+from game.misc import PathManager, Config, get_text_center_x_pos
 from .state import State
 from .stage_utils import GameState
 from ...objects import Tile, Water
@@ -28,7 +28,6 @@ class Menu(State):
         super().__init__()
         self.level_index = 1
         self.bg_tile = load(PathManager.get("assets/graphics/hud/grass.png")).convert()
-        self.font = Font(PathManager.get("assets/graphics/hud/font.ttf"), 10)
         self.tmx_data = load_pygame(PathManager.get(f"assets/maps/menu.tmx"))
         self.menu_sound = mixer.Sound(PathManager.get("assets/sounds/menu_sound.wav"))
         self.visible_sprites = Group()
@@ -59,20 +58,6 @@ class Menu(State):
             for x, y, surf in layer.tiles():
                 pos = (x * Config.TITLE_SIZE, y * Config.TITLE_SIZE)
                 Tile(pos, surf, [self.visible_sprites])
-
-    def render_text(self, index, custom_color=None) -> Surface | SurfaceType:
-        color = (
-            Color((255, 255, 255))
-            if index == self.active_index
-            else Color((150, 150, 150))
-        )
-        return self.font.render(
-            self.options[index], False, custom_color if custom_color else color
-        )
-
-    def get_text_position(self, text, index) -> Rect:
-        center = (self.center[0], self.center[1] - 10 + (index * 20))
-        return text.get_rect(center=center)
 
     def handle_action(self) -> None:
         if self.active_index == 0:
@@ -117,17 +102,17 @@ class Menu(State):
     def update(self, delta: float) -> None:
         self.visible_sprites.update(delta)
 
+    def render_menu_text(self, surface: Surface, index, y_pos: int, color: Color = (255, 255, 255)):
+        color = (150, 150, 150) if index != self.active_index else color
+        pos = self.get_menu_text_position(surface, y_pos, self.options[index], index)
+        self.render_text(surface, self.options[index], pos, color)
+
+    def get_menu_text_position(self, surface: Surface, y_pos: int, text: str, index: int) -> tuple[int, int]:
+        pos = get_text_center_x_pos(surface, self.font, text, y_pos)
+        return pos[0], pos[1] + (index * 20)
+
     def render(self, game_screen: Surface) -> None:
         self.visible_sprites.draw(game_screen)
-        game_screen.blit(
-            self.font.render("Bobby Carrot", False, (0, 0, 0)), (75 + 1, 55 + 1)
-        )
-        game_screen.blit(
-            self.font.render("Bobby Carrot", False, (255, 255, 255)), (75, 55)
-        )
+        self.render_text(game_screen, "Bobby Carrot", get_text_center_x_pos(game_screen, self.font, "Bobby Carrot", 55))
         for index, _ in enumerate(self.options):
-            text_render = self.render_text(index, (0, 0, 0))
-            pos = self.get_text_position(text_render, index)
-            game_screen.blit(text_render, (pos[0] + 1, pos[1] + 1))
-            text_render = self.render_text(index)
-            game_screen.blit(text_render, pos)
+            self.render_menu_text(game_screen, index, game_screen.get_rect().centery - 10)
