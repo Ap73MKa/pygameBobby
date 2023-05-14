@@ -5,10 +5,10 @@ from pygame.event import get as events
 from pygame.image import load
 from pygame.time import Clock
 from pygame.transform import scale
-from pygame import mixer
 
 from game.misc import Config, PathManager
 from game.scene import StateManager
+from game.scene.sound_manager import SoundManager
 
 
 class Game:
@@ -18,9 +18,9 @@ class Game:
         self.game_canvas = Surface((Config.WIDTH, Config.HEIGHT))
         self.screen = None
         self.clock = Clock()
+        self.load_background_music()
         self.initialize()
         self.manager = StateManager()
-        self.load_background_music()
 
     def initialize(self) -> None:
         pg.init()
@@ -29,8 +29,7 @@ class Game:
         self.screen = set_mode(self.size, pg.DOUBLEBUF)
 
     def load_background_music(self):
-        mixer.music.load(PathManager.get("assets/sounds/background_music.mp3"))
-        mixer.music.play(-1)
+        SoundManager().play_sound('background_music', -1)
 
     def handle_event(self) -> None:
         for event in events():

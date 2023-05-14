@@ -7,12 +7,8 @@ from pygame import (
     K_RIGHT,
     K_LEFT,
     K_RETURN,
-    Surface,
-    SurfaceType,
-    Rect,
-    mixer,
+    Surface
 )
-from pygame.font import Font
 from pygame.image import load
 from pytmx import load_pygame
 from pygame.sprite import Group
@@ -28,8 +24,7 @@ class Menu(State):
         super().__init__()
         self.level_index = 1
         self.bg_tile = load(PathManager.get("assets/graphics/hud/grass.png")).convert()
-        self.tmx_data = load_pygame(PathManager.get(f"assets/maps/menu.tmx"))
-        self.menu_sound = mixer.Sound(PathManager.get("assets/sounds/menu_sound.wav"))
+        self.tmx_data = load_pygame(str(PathManager.get("assets/maps/menu.tmx")))
         self.visible_sprites = Group()
         self.center = (Config.WIDTH // 2, Config.HEIGHT // 2)
         self.active_index = 0
@@ -96,7 +91,7 @@ class Menu(State):
             elif e.key == K_LEFT and self.active_index == 1:
                 self.handle_level_index(-1)
             elif e.key == K_RETURN:
-                self.menu_sound.play()
+                self.sound_manager.play_sound('menu_sound')
                 self.handle_action()
 
     def update(self, delta: float) -> None:
@@ -114,5 +109,5 @@ class Menu(State):
     def render(self, game_screen: Surface) -> None:
         self.visible_sprites.draw(game_screen)
         self.render_text(game_screen, "Bobby Carrot", get_text_center_x_pos(game_screen, self.font, "Bobby Carrot", 55))
-        for index, _ in enumerate(self.options):
+        for index in range(len(self.options)):
             self.render_menu_text(game_screen, index, game_screen.get_rect().centery - 10)

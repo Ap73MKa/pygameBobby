@@ -3,12 +3,14 @@ from pygame.font import Font
 from pygame.display import get_surface
 from pygame.event import Event
 
-from .stage_utils import GameState
 from game.misc import PathManager
+from .stage_utils import GameState
+from ..sound_manager import SoundManager
 
 
 class State:
     def __init__(self) -> None:
+        self.sound_manager = SoundManager()
         self.done = self.quit = False
         self.next_state: GameState | None = None
         self.screen_rect = get_surface().get_rect()

@@ -24,7 +24,7 @@ class UI:
 
     def update(self, carrot_count: int) -> None:
         self.carrot_count = carrot_count
-        self.elapsed_time += pygame.time.Clock().tick(60)
+        self.elapsed_time += pygame.time.Clock().tick(Config.FPS)
         minutes = int(self.elapsed_time / 60000)
         seconds = int((self.elapsed_time % 60000) / 1000)
         self.timer_text = f"{minutes:02d}:{seconds:02d}"

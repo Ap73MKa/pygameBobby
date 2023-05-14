@@ -1,10 +1,10 @@
 import pygame as pg
 
-from pygame import Color, Surface, SurfaceType, Rect, mixer
+from pygame import Color, Surface, Rect
 from pygame.font import Font
 from pygame.image import load
 
-from game.misc import Config, PathManager
+from game.misc import Config, PathManager, get_text_center_x_pos
 from .state import State
 from .stage_utils import GameState
 
@@ -17,7 +17,6 @@ class Pause(State):
         self.center = (Config.WIDTH // 2, Config.HEIGHT // 2)
         self.active_index = 0
         self.options = ["Continue", "Reload level", "Back to menu", "Exit"]
-        self.menu_sound = mixer.Sound(PathManager.get("assets/sounds/menu_sound.wav"))
         self.is_drawn_once = False
         self.persist = {}
 
@@ -55,18 +54,17 @@ class Pause(State):
             elif e.key == pg.K_DOWN:
                 self.handle_option_index(1)
             elif e.key == pg.K_RETURN:
-                self.menu_sound.play()
+                self.sound_manager.play_sound('menu_sound')
                 self.handle_action()
 
-    def render_text(self, index, custom_color=None) -> Surface | SurfaceType:
-        color = (
-            Color((255, 255, 255))
-            if index == self.active_index
-            else Color((100, 100, 100))
-        )
-        return self.font.render(
-            self.options[index], False, custom_color if custom_color else color
-        )
+    def render_menu_text(self, surface: Surface, index, y_pos: int, color: Color = (255, 255, 255)):
+        color = (100, 100, 100) if index != self.active_index else color
+        pos = self.get_menu_text_position(surface, y_pos, self.options[index], index)
+        self.render_text(surface, self.options[index], pos, color)
+
+    def get_menu_text_position(self, surface: Surface, y_pos: int, text: str, index: int) -> tuple[int, int]:
+        pos = get_text_center_x_pos(surface, self.font, text, y_pos)
+        return pos[0], pos[1] + (index * 20)
 
     def get_text_position(self, text, index) -> Rect:
         center = (self.center[0], self.center[1] - 30 + (index * 20))
@@ -80,10 +78,5 @@ class Pause(State):
             dark.set_alpha(100)
             game_screen.blit(dark, (0, 0))
 
-        # Options
-        for index, _ in enumerate(self.options):
-            text_render = self.render_text(index, (0, 0, 0))
-            pos = self.get_text_position(text_render, index)
-            game_screen.blit(text_render, (pos[0] + 1, pos[1] + 1))
-            text_render = self.render_text(index)
-            game_screen.blit(text_render, pos)
+        for index in range(len(self.options)):
+            self.render_menu_text(game_screen, index, game_screen.get_rect().centery - 30)

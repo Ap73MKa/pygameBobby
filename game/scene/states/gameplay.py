@@ -1,8 +1,7 @@
 from pygame.image import load
 from pytmx import TiledMap
 from pytmx.util_pygame import load_pygame
-from pygame import Surface, Vector2, KEYUP, K_ESCAPE, QUIT, mixer
-from pygame.display import get_surface
+from pygame import Surface, Vector2, KEYUP, K_ESCAPE, QUIT
 from pygame.sprite import Group
 from pygame.time import get_ticks
 
@@ -10,25 +9,24 @@ from game.misc import Config, PathManager
 from game.objects import Carrot, Player, Trap, Trigger, Tile, Water
 from game.scene.ui import UI
 from game.scene.camera import CameraGroup
-from .stage_utils import GameState
-from .state import State
+from game.scene.states.stage_utils import GameState
+from game.scene.states.state import State
 
 
 class Gameplay(State):
     def __init__(self) -> None:
         super().__init__()
+        self.corner = Vector2(Config.WIDTH, Config.HEIGHT)
+        self.next_state = GameState.TRANSITION
+
         self.player: Player | None = None
         self.tmx_data: TiledMap | None = None
         self.carrots_count = self.found_carrots = 0
         self.start_pos = (0, 0)
         self.index_map = 1
-        self.corner = Vector2(Config.WIDTH, Config.HEIGHT)
-        self.next_state = GameState.TRANSITION
         self.is_player_died = False
         self.die_time = get_ticks()
 
-        # Groups
-        self.display_surface = get_surface()
         self.visible_sprites = CameraGroup()
         self.collision_sprites = Group()
         self.level_triggers_group = Group()
@@ -36,53 +34,33 @@ class Gameplay(State):
         self.traps_group = Group()
         self.ui = UI()
 
-        # Sounds
-        self.carrot_sound = mixer.Sound(
-            PathManager.get("assets/sounds/carrot_pickup.wav")
-        )
-        self.exit_sound = mixer.Sound(PathManager.get("assets/sounds/exit_sound.wav"))
-        self.hit_sound = mixer.Sound(PathManager.get("assets/sounds/hit_sound.wav"))
-        self.spawn_sound = mixer.Sound(PathManager.get("assets/sounds/spawn_sound.wav"))
-
-        self.on_load()
+        self.load_data()
 
     def startup(self, persistent: dict) -> None:
         self.next_state = GameState.TRANSITION
-        index = self.index_map
-        reload = False
-        for key, item in persistent.items():
-            if key == "level":
-                index = item
-            if key == "reload":
-                reload = item
+        index = persistent.get('level', self.index_map)
+        reload = persistent.get('reload', False)
         if self.index_map != index or reload:
             self.index_map = index
-            self.on_load()
+            self.reset_data()
+            self.load_data()
 
-    def on_load(self) -> None:
-        # Reset
+    def reset_data(self):
         self.visible_sprites.empty()
         self.collision_sprites.empty()
         self.level_triggers_group.empty()
         self.carrots_group.empty()
         self.traps_group.empty()
-
         self.carrots_count = self.found_carrots = 0
         self.is_player_died = False
         self.player = None
         self.ui.set_start_time(get_ticks())
 
-        # Load
-        self.tmx_data = load_pygame(
-            PathManager.get(f"assets/maps/map{self.index_map}.tmx")
-        )
-        self.corner = (
-            Vector2(self.tmx_data.width, self.tmx_data.height) * Config.TITLE_SIZE
-        )
+    def load_data(self) -> None:
+        self.tmx_data = load_pygame(str(PathManager.get(f"assets/maps/map{self.index_map}.tmx")))
+        self.corner = Vector2(self.tmx_data.width, self.tmx_data.height) * Config.TITLE_SIZE
         self.load_map()
-        self.player = Player(
-            self.start_pos, self.visible_sprites, self.collision_sprites
-        )
+        self.player = Player(self.start_pos, self.visible_sprites, self.collision_sprites)
 
     def load_map(self) -> None:
         layer = self.tmx_data.get_layer_by_name("background")
@@ -148,13 +126,13 @@ class Gameplay(State):
                 "time": self.ui.timer_text,
                 "steps": self.player.get_step_count(),
             }
-            self.exit_sound.play()
+            self.sound_manager.play_sound('exit_sound')
             self.done = True
 
         for carrot in self.carrots_group:
             if carrot.rect.topleft == self.player.pos and not carrot.activated:
                 self.found_carrots += 1
-                self.carrot_sound.play()
+                self.sound_manager.play_sound('carrot_sound')
                 carrot.activate()
 
         for trap in self.traps_group:
@@ -168,12 +146,13 @@ class Gameplay(State):
     def timeout_death(self) -> None:
         self.player.die()
         if not self.is_player_died:
-            self.hit_sound.play()
+            self.sound_manager.play_sound('hit_sound')
             self.is_player_died = True
             self.die_time = get_ticks()
         if get_ticks() - self.die_time >= 500:
-            self.on_load()
-            self.spawn_sound.play()
+            self.reset_data()
+            self.load_data()
+            self.sound_manager.play_sound('spawn_sound')
 
     def check_end(self) -> None:
         if self.carrots_count == self.found_carrots:
@@ -188,11 +167,11 @@ class Gameplay(State):
 
     def update(self, delta: float) -> None:
         self.check_collide()
-        self.visible_sprites.custom_update(self.player, self.corner, delta)
+        self.visible_sprites.update_camera_pos(self.player, self.corner, delta)
         self.visible_sprites.update(delta)
         self.check_end()
         self.ui.update(self.carrots_count - self.found_carrots)
 
-    def render(self, game_screen: Surface) -> None:
-        self.visible_sprites.custom_render(game_screen)
-        self.ui.render(game_screen)
+    def render(self, game_surface: Surface) -> None:
+        self.visible_sprites.custom_render(game_surface)
+        self.ui.render(game_surface)

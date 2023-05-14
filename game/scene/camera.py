@@ -12,6 +12,7 @@ class CameraGroup(Group):
         self.size = Vector2((Config.WIDTH, Config.HEIGHT))
         self.camera = self.size / 2
         self.offset = Vector2()
+        self.render_texture = Surface(self.size)
 
     def is_visible(self, sprite) -> bool:
         return (
@@ -23,7 +24,7 @@ class CameraGroup(Group):
             > -Config.TITLE_SIZE - self.offset.x
         )
 
-    def custom_update(self, player: Player, corner: Vector2, delta: float):
+    def update_camera_pos(self, player: Player, corner: Vector2, delta: float):
         heading = player.rect.center - self.camera
         self.camera += heading * 0.1 * 50 * delta
         self.offset = self.camera - (self.size / 2)
@@ -33,10 +34,12 @@ class CameraGroup(Group):
         self.offset = Vector2(round(self.offset.x), round(self.offset.y))
 
     def custom_render(self, surface: Surface):
+        self.render_texture.fill((0, 0, 0))
         offset_sprites = (
             (sprite, sprite.rect.topleft - self.offset)
             for sprite in self.sprites()
             if self.is_visible(sprite)
         )
         for sprite, offset_pos in offset_sprites:
-            surface.blit(sprite.image, offset_pos)
+            self.render_texture.blit(sprite.image, offset_pos)
+        surface.blit(self.render_texture, (0, 0))
