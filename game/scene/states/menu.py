@@ -1,14 +1,4 @@
-from pygame import (
-    Color,
-    QUIT,
-    KEYUP,
-    K_UP,
-    K_DOWN,
-    K_RIGHT,
-    K_LEFT,
-    K_RETURN,
-    Surface
-)
+from pygame import Color, QUIT, KEYUP, K_UP, K_DOWN, K_RIGHT, K_LEFT, K_RETURN, Surface
 from pygame.image import load
 from pytmx import load_pygame
 from pygame.sprite import Group
@@ -91,23 +81,33 @@ class Menu(State):
             elif e.key == K_LEFT and self.active_index == 1:
                 self.handle_level_index(-1)
             elif e.key == K_RETURN:
-                self.sound_manager.play_sound('menu_sound')
+                self.sound_manager.play_sound("menu_sound")
                 self.handle_action()
 
     def update(self, delta: float) -> None:
         self.visible_sprites.update(delta)
 
-    def render_menu_text(self, surface: Surface, index, y_pos: int, color: Color = (255, 255, 255)):
+    def render_menu_text(
+        self, surface: Surface, index, y_pos: int, color: Color = (255, 255, 255)
+    ):
         color = (150, 150, 150) if index != self.active_index else color
         pos = self.get_menu_text_position(surface, y_pos, self.options[index], index)
         self.render_text(surface, self.options[index], pos, color)
 
-    def get_menu_text_position(self, surface: Surface, y_pos: int, text: str, index: int) -> tuple[int, int]:
+    def get_menu_text_position(
+        self, surface: Surface, y_pos: int, text: str, index: int
+    ) -> tuple[int, int]:
         pos = get_text_center_x_pos(surface, self.font, text, y_pos)
         return pos[0], pos[1] + (index * 20)
 
-    def render(self, game_screen: Surface) -> None:
-        self.visible_sprites.draw(game_screen)
-        self.render_text(game_screen, "Bobby Carrot", get_text_center_x_pos(game_screen, self.font, "Bobby Carrot", 55))
+    def render(self, game_surface: Surface) -> None:
+        self.visible_sprites.draw(game_surface)
+        self.render_text(
+            game_surface,
+            "Bobby Carrot",
+            get_text_center_x_pos(game_surface, self.font, "Bobby Carrot", 55),
+        )
         for index in range(len(self.options)):
-            self.render_menu_text(game_screen, index, game_screen.get_rect().centery - 10)
+            self.render_menu_text(
+                game_surface, index, game_surface.get_rect().centery - 10
+            )

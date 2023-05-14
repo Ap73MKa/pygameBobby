@@ -29,7 +29,7 @@ class Game:
         self.screen = set_mode(self.size, pg.DOUBLEBUF)
 
     def load_background_music(self):
-        SoundManager().play_sound('background_music', -1)
+        SoundManager().play_sound("background_music", -1)
 
     def handle_event(self) -> None:
         for event in events():

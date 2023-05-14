@@ -11,7 +11,9 @@ class SoundManager(metaclass=SingletonMeta):
         self.load_sounds()
 
     def load_sounds(self) -> None:
-        sound_folder = PathManager.get_all_files_by_ext("assets/sounds/", ['mp3', 'wav'])
+        sound_folder = PathManager.get_all_files_by_ext(
+            "assets/sounds/", ["mp3", "wav"]
+        )
         self.sounds = {file.stem: mixer.Sound(file) for file in sound_folder}
 
     def play_sound(self, sound_name: str, loops: int = 0) -> None:

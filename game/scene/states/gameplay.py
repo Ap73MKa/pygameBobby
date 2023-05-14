@@ -38,8 +38,8 @@ class Gameplay(State):
 
     def startup(self, persistent: dict) -> None:
         self.next_state = GameState.TRANSITION
-        index = persistent.get('level', self.index_map)
-        reload = persistent.get('reload', False)
+        index = persistent.get("level", self.index_map)
+        reload = persistent.get("reload", False)
         if self.index_map != index or reload:
             self.index_map = index
             self.reset_data()
@@ -57,10 +57,16 @@ class Gameplay(State):
         self.ui.set_start_time(get_ticks())
 
     def load_data(self) -> None:
-        self.tmx_data = load_pygame(str(PathManager.get(f"assets/maps/map{self.index_map}.tmx")))
-        self.corner = Vector2(self.tmx_data.width, self.tmx_data.height) * Config.TITLE_SIZE
+        self.tmx_data = load_pygame(
+            str(PathManager.get(f"assets/maps/map{self.index_map}.tmx"))
+        )
+        self.corner = (
+            Vector2(self.tmx_data.width, self.tmx_data.height) * Config.TITLE_SIZE
+        )
         self.load_map()
-        self.player = Player(self.start_pos, self.visible_sprites, self.collision_sprites)
+        self.player = Player(
+            self.start_pos, self.visible_sprites, self.collision_sprites
+        )
 
     def load_map(self) -> None:
         layer = self.tmx_data.get_layer_by_name("background")
@@ -126,13 +132,13 @@ class Gameplay(State):
                 "time": self.ui.timer_text,
                 "steps": self.player.get_step_count(),
             }
-            self.sound_manager.play_sound('exit_sound')
+            self.sound_manager.play_sound("exit_sound")
             self.done = True
 
         for carrot in self.carrots_group:
             if carrot.rect.topleft == self.player.pos and not carrot.activated:
                 self.found_carrots += 1
-                self.sound_manager.play_sound('carrot_sound')
+                self.sound_manager.play_sound("carrot_sound")
                 carrot.activate()
 
         for trap in self.traps_group:
@@ -146,13 +152,13 @@ class Gameplay(State):
     def timeout_death(self) -> None:
         self.player.die()
         if not self.is_player_died:
-            self.sound_manager.play_sound('hit_sound')
+            self.sound_manager.play_sound("hit_sound")
             self.is_player_died = True
             self.die_time = get_ticks()
         if get_ticks() - self.die_time >= 500:
             self.reset_data()
             self.load_data()
-            self.sound_manager.play_sound('spawn_sound')
+            self.sound_manager.play_sound("spawn_sound")
 
     def check_end(self) -> None:
         if self.carrots_count == self.found_carrots:

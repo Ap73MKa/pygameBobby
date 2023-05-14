@@ -54,15 +54,19 @@ class Pause(State):
             elif e.key == pg.K_DOWN:
                 self.handle_option_index(1)
             elif e.key == pg.K_RETURN:
-                self.sound_manager.play_sound('menu_sound')
+                self.sound_manager.play_sound("menu_sound")
                 self.handle_action()
 
-    def render_menu_text(self, surface: Surface, index, y_pos: int, color: Color = (255, 255, 255)):
+    def render_menu_text(
+        self, surface: Surface, index, y_pos: int, color: Color = (255, 255, 255)
+    ):
         color = (100, 100, 100) if index != self.active_index else color
         pos = self.get_menu_text_position(surface, y_pos, self.options[index], index)
         self.render_text(surface, self.options[index], pos, color)
 
-    def get_menu_text_position(self, surface: Surface, y_pos: int, text: str, index: int) -> tuple[int, int]:
+    def get_menu_text_position(
+        self, surface: Surface, y_pos: int, text: str, index: int
+    ) -> tuple[int, int]:
         pos = get_text_center_x_pos(surface, self.font, text, y_pos)
         return pos[0], pos[1] + (index * 20)
 
@@ -79,4 +83,6 @@ class Pause(State):
             game_screen.blit(dark, (0, 0))
 
         for index in range(len(self.options)):
-            self.render_menu_text(game_screen, index, game_screen.get_rect().centery - 30)
+            self.render_menu_text(
+                game_screen, index, game_screen.get_rect().centery - 30
+            )

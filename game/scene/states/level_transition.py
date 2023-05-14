@@ -27,7 +27,7 @@ class LevelTransition(State):
         self.stats_text = [
             f"Time: {self.time}",
             f"Steps: {self.steps}",
-            "Press any key to continue"
+            "Press any key to continue",
         ]
 
     def get_event(self, e) -> None:
@@ -56,4 +56,8 @@ class LevelTransition(State):
             self.render_dark_overlay(game_screen)
             self.blit_text_center(game_screen, "SUCCESS", 50)
             for index, text in enumerate(self.stats_text):
-                self.blit_text_center(game_screen, text, self.get_screen_center(game_screen)[1] - 10 + (index * 20))
+                self.blit_text_center(
+                    game_screen,
+                    text,
+                    self.get_screen_center(game_screen)[1] - 10 + (index * 20),
+                )

@@ -20,8 +20,14 @@ class State:
     def startup(self, persistent: dict) -> None:
         self.persist = persistent
 
-    def render_text(self, game_screen: Surface, text: str, position: tuple[int, int],
-                    color: Color = (255, 255, 255), shadow: bool = True) -> None:
+    def render_text(
+        self,
+        game_screen: Surface,
+        text: str,
+        position: tuple[int, int],
+        color: Color = (255, 255, 255),
+        shadow: bool = True,
+    ) -> None:
         if shadow:
             text_shadow = self.font.render(text, False, (0, 0, 0))
             game_screen.blit(text_shadow, (position[0] + 1, position[1] + 1))

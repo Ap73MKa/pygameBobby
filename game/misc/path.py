@@ -23,4 +23,8 @@ class PathManager(ABC):
 
     @classmethod
     def get_all_files_by_ext(cls, path: str, ext: list[str]):
-        return [f for f in Path(cls.get(path)).iterdir() if f.is_file() and f.suffix[1:] in ext]
+        return [
+            f
+            for f in Path(cls.get(path)).iterdir()
+            if f.is_file() and f.suffix[1:] in ext
+        ]

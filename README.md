@@ -1,4 +1,4 @@
-# Bobby Carrot
+# pygameBobby
 
 [![CodeFactor](https://www.codefactor.io/repository/github/ap73mka/pygamebobby/badge)](https://www.codefactor.io/repository/github/ap73mka/pygamebobby)
 ![](https://badgen.net/github/checks/ap73mka/pygameBobby)
@@ -6,11 +6,12 @@
 ![](https://badgen.net/badge/Licence/MIT/blue)
 ![](https://badgen.net/badge/Python/3.10/blue?icon=pypi)
 
-A Bobby Carrot clone made using [pygame](https://github.com/pygame/pygame).
+pygameBobby is a simple puzzle game inspired by the Bobby Carrot
+game. It is written in Python using the [pygame](https://github.com/pygame/pygame).
+The game was created as a learning project to explore
+the possibilities of Pygame and develop game applications.
 
 # Preview
-
-[<img src="preview.gif" width="576" height="476" alt="preview"/>](preview.gif)
 
 # Project setup
 
@@ -33,3 +34,7 @@ pip install -r requirements.txt
 ```bash
 python -m game
 ```
+
+## License
+
+The ShortyReactClient project is licensed under the <ins>MIT License</ins>. Feel free to modify and distribute this code as per the terms of the license.
