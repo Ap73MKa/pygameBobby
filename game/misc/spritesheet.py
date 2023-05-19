@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from pygame import image
 from pygame.surface import Surface
 

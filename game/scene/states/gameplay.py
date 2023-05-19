@@ -1,4 +1,3 @@
-from pygame.image import load
 from pytmx import TiledMap
 from pytmx.util_pygame import load_pygame
 from pygame import Surface, Vector2, KEYUP, K_ESCAPE, QUIT
@@ -6,7 +5,8 @@ from pygame.sprite import Group
 from pygame.time import get_ticks
 
 from game.misc import Config, PathManager
-from game.objects import Carrot, Player, Trap, Trigger, Tile, Water
+from game.objects import Player, Trigger
+from game.scene.map_loader import MapLoader
 from game.scene.ui import UI
 from game.scene.camera import CameraGroup
 from game.scene.states.stage_utils import GameState
@@ -20,7 +20,6 @@ class Gameplay(State):
         self.next_state = GameState.TRANSITION
 
         self.player: Player | None = None
-        self.tmx_data: TiledMap | None = None
         self.carrots_count = self.found_carrots = 0
         self.start_pos = (0, 0)
         self.index_map = 1
@@ -34,94 +33,55 @@ class Gameplay(State):
         self.traps_group = Group()
         self.ui = UI()
 
-        self.load_data()
+        self.load_data(self.get_tmx_data())
 
     def startup(self, persistent: dict) -> None:
         self.next_state = GameState.TRANSITION
         index = persistent.get("level", self.index_map)
         reload = persistent.get("reload", False)
-        if self.index_map != index or reload:
-            self.index_map = index
+        if reload:
             self.reset_data()
-            self.load_data()
+        if self.index_map != index:
+            self.index_map = index
+            self.load_data(self.get_tmx_data())
+
+    def get_tmx_data(self) -> TiledMap:
+        return load_pygame(str(PathManager.get(f"assets/maps/map{self.index_map}.tmx")))
 
     def reset_data(self):
-        self.visible_sprites.empty()
-        self.collision_sprites.empty()
-        self.level_triggers_group.empty()
-        self.carrots_group.empty()
-        self.traps_group.empty()
-        self.carrots_count = self.found_carrots = 0
+        self.reset_objects()
+        self.carrots_count = len(self.carrots_group)
+        self.visible_sprites.remove(self.player)
+        self.found_carrots = 0
         self.is_player_died = False
-        self.player = None
+        self.player = Player(self.start_pos, self.visible_sprites, self.collision_sprites)
         self.ui.set_start_time(get_ticks())
 
-    def load_data(self) -> None:
-        self.tmx_data = load_pygame(
-            str(PathManager.get(f"assets/maps/map{self.index_map}.tmx"))
-        )
-        self.corner = (
-            Vector2(self.tmx_data.width, self.tmx_data.height) * Config.TITLE_SIZE
-        )
-        self.load_map()
+    def reset_objects(self):
+        for carrot in self.carrots_group:
+            carrot.deactivate()
+        for trap in self.traps_group:
+            trap.deactivate()
+        for level_trigger in self.level_triggers_group:
+            level_trigger.deactivate()
+
+    def load_data(self, tmx_data: TiledMap) -> None:
+        map_loader = MapLoader()
+        self.corner = Vector2(tmx_data.width, tmx_data.height) * Config.TITLE_SIZE
+        (
+            self.start_pos,
+            self.visible_sprites,
+            self.collision_sprites,
+            self.level_triggers_group,
+            self.carrots_group,
+            self.traps_group,
+        ) = map_loader.load_data(tmx_data)
         self.player = Player(
             self.start_pos, self.visible_sprites, self.collision_sprites
         )
+        self.carrots_count = len(self.carrots_group)
 
-    def load_map(self) -> None:
-        layer = self.tmx_data.get_layer_by_name("background")
-        if hasattr(layer, "data"):
-            for x, y, surf in layer.tiles():
-                pos = (x * Config.TITLE_SIZE, y * Config.TITLE_SIZE)
-                Water(pos, [self.visible_sprites])
-
-        for layer in self.tmx_data.visible_layers:
-            if not hasattr(layer, "data"):
-                break
-            for x, y, surf in layer.tiles():
-                pos = (x * Config.TITLE_SIZE, y * Config.TITLE_SIZE)
-                Tile(pos, surf, [self.visible_sprites])
-
-        layer = self.tmx_data.get_layer_by_name("traps")
-        if hasattr(layer, "data"):
-            for x, y, surf in layer.tiles():
-                pos = (x * Config.TITLE_SIZE, y * Config.TITLE_SIZE)
-                Trap(pos, [self.traps_group, self.visible_sprites])
-
-        layer = self.tmx_data.get_layer_by_name("spawn_point")
-        if hasattr(layer, "data"):
-            for x, y, surf in layer.tiles():
-                pos = (x * Config.TITLE_SIZE, y * Config.TITLE_SIZE)
-                surf = load(
-                    PathManager.get("assets/graphics/objects/spawn_trigger.png")
-                )
-                Tile(pos, surf, [self.visible_sprites])
-                self.start_pos = pos
-
-        layer = self.tmx_data.get_layer_by_name("exit_point")
-        if hasattr(layer, "data"):
-            for x, y, surf in layer.tiles():
-                pos = (x * Config.TITLE_SIZE, y * Config.TITLE_SIZE)
-                Trigger(pos, [self.level_triggers_group, self.visible_sprites])
-
-        layer = self.tmx_data.get_layer_by_name("carrots")
-        if hasattr(layer, "data"):
-            for x, y, surf in layer.tiles():
-                self.carrots_count += 1
-                pos = (x * Config.TITLE_SIZE, y * Config.TITLE_SIZE)
-                Carrot(pos, [self.carrots_group, self.visible_sprites])
-
-        layer = self.tmx_data.get_layer_by_name("border")
-        if hasattr(layer, "data"):
-            for x, y, surf in layer.tiles():
-                pos = (x * Config.TITLE_SIZE, y * Config.TITLE_SIZE)
-                Tile(
-                    pos,
-                    Surface((Config.TITLE_SIZE, Config.TITLE_SIZE)),
-                    [self.collision_sprites],
-                )
-
-    def check_collide(self) -> None:
+    def check_level_trigger(self):
         level_trigger: Trigger = self.level_triggers_group.sprites()[0]
         if (
             level_trigger.rect.topleft == self.player.pos
@@ -135,19 +95,26 @@ class Gameplay(State):
             self.sound_manager.play_sound("exit_sound")
             self.done = True
 
+    def check_carrot_trigger(self):
         for carrot in self.carrots_group:
             if carrot.rect.topleft == self.player.pos and not carrot.activated:
                 self.found_carrots += 1
-                self.sound_manager.play_sound("carrot_sound")
+                self.sound_manager.play_sound("carrot_pickup")
                 carrot.activate()
 
+    def check_trap_trigger(self):
         for trap in self.traps_group:
             if trap.rect.topleft == self.player.pos:
-                trap.touched = True
-                if trap.activate:
+                trap.is_touched = True
+                if trap.is_activated:
                     self.timeout_death()
-            elif trap.touched and not trap.activate:
+            elif trap.is_touched and not trap.is_activated:
                 trap.activate_trap()
+
+    def check_collide(self) -> None:
+        self.check_level_trigger()
+        self.check_carrot_trigger()
+        self.check_trap_trigger()
 
     def timeout_death(self) -> None:
         self.player.die()
@@ -157,7 +124,6 @@ class Gameplay(State):
             self.die_time = get_ticks()
         if get_ticks() - self.die_time >= 500:
             self.reset_data()
-            self.load_data()
             self.sound_manager.play_sound("spawn_sound")
 
     def check_end(self) -> None:
