@@ -3,7 +3,7 @@ from pygame.image import load
 from pytmx import load_pygame
 from pygame.sprite import Group
 
-from game.misc import PathManager, Config, get_text_center_x_pos
+from game.misc import PathManager, Config, FontManager
 from .state import State
 from .stage_utils import GameState
 from ...objects import Tile, Water
@@ -13,6 +13,7 @@ class Menu(State):
     def __init__(self) -> None:
         super().__init__()
         self.level_index = 1
+        self.font_manager = FontManager()
         self.bg_tile = load(PathManager.get("assets/graphics/hud/grass.png")).convert()
         self.tmx_data = load_pygame(str(PathManager.get("assets/maps/menu.tmx")))
         self.visible_sprites = Group()
@@ -92,20 +93,20 @@ class Menu(State):
     ):
         color = (150, 150, 150) if index != self.active_index else color
         pos = self.get_menu_text_position(surface, y_pos, self.options[index], index)
-        self.render_text(surface, self.options[index], pos, color)
+        self.font_manager.render_text(surface, self.options[index], pos, color)
 
     def get_menu_text_position(
         self, surface: Surface, y_pos: int, text: str, index: int
     ) -> tuple[int, int]:
-        pos = get_text_center_x_pos(surface, self.font, text, y_pos)
+        pos = self.font_manager.get_text_center_x_pos(surface, text, y_pos)
         return pos[0], pos[1] + (index * 20)
 
     def render(self, game_surface: Surface) -> None:
         self.visible_sprites.draw(game_surface)
-        self.render_text(
+        self.font_manager.render_text(
             game_surface,
             "Bobby Carrot",
-            get_text_center_x_pos(game_surface, self.font, "Bobby Carrot", 55),
+            self.font_manager.get_text_center_x_pos(game_surface, "Bobby Carrot", 55),
         )
         for index in range(len(self.options)):
             self.render_menu_text(

@@ -1,10 +1,9 @@
 import pygame as pg
 
 from pygame import Color, Surface, Rect
-from pygame.font import Font
 from pygame.image import load
 
-from game.misc import Config, PathManager, get_text_center_x_pos
+from game.misc import Config, PathManager, FontManager
 from .state import State
 from .stage_utils import GameState
 
@@ -12,8 +11,8 @@ from .stage_utils import GameState
 class Pause(State):
     def __init__(self) -> None:
         super().__init__()
+        self.font_manager = FontManager()
         self.bg_tile = load(PathManager.get("assets/graphics/hud/grass.png")).convert()
-        self.font = Font(PathManager.get("assets/graphics/hud/font.ttf"), 10)
         self.center = (Config.WIDTH // 2, Config.HEIGHT // 2)
         self.active_index = 0
         self.options = ["Continue", "Reload level", "Back to menu", "Exit"]
@@ -62,12 +61,12 @@ class Pause(State):
     ):
         color = (100, 100, 100) if index != self.active_index else color
         pos = self.get_menu_text_position(surface, y_pos, self.options[index], index)
-        self.render_text(surface, self.options[index], pos, color)
+        self.font_manager.render_text(surface, self.options[index], pos, color)
 
     def get_menu_text_position(
         self, surface: Surface, y_pos: int, text: str, index: int
     ) -> tuple[int, int]:
-        pos = get_text_center_x_pos(surface, self.font, text, y_pos)
+        pos = self.font_manager.get_text_center_x_pos(surface, text, y_pos)
         return pos[0], pos[1] + (index * 20)
 
     def get_text_position(self, text, index) -> Rect:

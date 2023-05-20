@@ -1,8 +1,7 @@
 import pygame as pg
 from pygame.surface import Surface
-from pygame.font import Font
 
-from game.misc import PathManager, Config, get_text_center_x_pos
+from game.misc import Config, FontManager
 from .stage_utils import GameState
 from .state import State
 
@@ -10,7 +9,7 @@ from .state import State
 class LevelTransition(State):
     def __init__(self) -> None:
         super().__init__()
-        self.font = Font(PathManager.get("assets/graphics/hud/font.ttf"), 10)
+        self.font_manager = FontManager()
         self.next_state = GameState.GAMEPLAY
         self.is_drawn = False
         self.level = 1
@@ -41,8 +40,8 @@ class LevelTransition(State):
             self.done = True
 
     def blit_text_center(self, surface: Surface, text: str, y_pos: int) -> None:
-        pos = get_text_center_x_pos(surface, self.font, text, y_pos)
-        self.render_text(surface, text, pos)
+        pos = self.font_manager.get_text_center_x_pos(surface, text, y_pos)
+        self.font_manager.render_text(surface, text, pos)
 
     def render_dark_overlay(self, surface: Surface):
         dark = Surface((Config.WIDTH, Config.HEIGHT))

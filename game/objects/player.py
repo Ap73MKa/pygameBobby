@@ -59,22 +59,21 @@ class Player(Sprite):
         self.step_count = 0
 
     @staticmethod
-    def get_direction():
-        keys = get_pressed()
+    def get_direction(keys):
         direction = Vector2()
         anim_state = AnimEnum.DOWN
-        for dir, key_list in direction_mapping.items():
+        for dir_value, key_list in direction_mapping.items():
             for key in key_list:
                 if keys[key]:
-                    direction = Vector2(*dir[:2])
-                    anim_state = dir[2]
+                    direction = Vector2(*dir_value[:2])
+                    anim_state = dir_value[2]
                     break
         return direction, anim_state
 
     def input(self):
         if self.anim_state == AnimEnum.DYING or self.direction:
             return
-        self.direction, state = self.get_direction()
+        self.direction, state = self.get_direction(get_pressed())
         if self.direction:
             self.anim_state = state
             self.target_pos += self.direction * Config.TITLE_SIZE

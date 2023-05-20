@@ -57,7 +57,7 @@ class Gameplay(State):
         self.player = Player(
             self.start_pos, self.visible_sprites, self.collision_sprites
         )
-        self.ui.set_start_time(get_ticks())
+        self.ui.reset()
 
     def reset_objects(self):
         for carrot in self.carrots_group:
@@ -82,6 +82,8 @@ class Gameplay(State):
             self.start_pos, self.visible_sprites, self.collision_sprites
         )
         self.carrots_count = len(self.carrots_group)
+        self.found_carrots = 0
+        self.ui.reset()
 
     def check_level_trigger(self):
         level_trigger: Trigger = self.level_triggers_group.sprites()[0]
@@ -91,7 +93,7 @@ class Gameplay(State):
         ):
             self.persist = {
                 "level": self.index_map + 1,
-                "time": self.ui.timer_text,
+                "time": self.ui.get_time(),
                 "steps": self.player.get_step_count(),
             }
             self.sound_manager.play_sound("exit_sound")
@@ -141,8 +143,8 @@ class Gameplay(State):
 
     def update(self, delta: float) -> None:
         self.check_collide()
-        self.visible_sprites.update_camera_pos(self.player, self.corner, delta)
         self.visible_sprites.update(delta)
+        self.visible_sprites.update_camera_pos(self.player, self.corner, delta)
         self.check_end()
         self.ui.update(self.carrots_count - self.found_carrots)
 
