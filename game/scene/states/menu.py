@@ -1,19 +1,19 @@
 from pygame import Color, QUIT, KEYUP, K_UP, K_DOWN, K_RIGHT, K_LEFT, K_RETURN, Surface
 from pygame.image import load
-from pytmx import load_pygame
 from pygame.sprite import Group
+from pytmx import load_pygame
 
-from game.misc import PathManager, Config, FontManager
+from game.misc import PathManager, Config
+from game.objects import Tile, Water
 from .state import State
 from .stage_utils import GameState
-from ...objects import Tile, Water
+
 
 
 class Menu(State):
     def __init__(self) -> None:
         super().__init__()
         self.level_index = 1
-        self.font_manager = FontManager()
         self.bg_tile = load(PathManager.get("assets/graphics/hud/grass.png")).convert()
         self.tmx_data = load_pygame(str(PathManager.get("assets/maps/menu.tmx")))
         self.visible_sprites = Group()
@@ -69,7 +69,7 @@ class Menu(State):
             self.level_index = Config.MAX_LEVEL
         self.options[1] = f"Choose level <{self.level_index}>"
 
-    def get_event(self, e) -> None:
+    def handle_events(self, e) -> None:
         if e.type == QUIT:
             self.quit = True
         elif e.type == KEYUP:

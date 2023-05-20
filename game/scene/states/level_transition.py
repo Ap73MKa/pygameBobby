@@ -1,7 +1,7 @@
 import pygame as pg
 from pygame.surface import Surface
 
-from game.misc import Config, FontManager
+from game.misc import Config
 from .stage_utils import GameState
 from .state import State
 
@@ -9,7 +9,6 @@ from .state import State
 class LevelTransition(State):
     def __init__(self) -> None:
         super().__init__()
-        self.font_manager = FontManager()
         self.next_state = GameState.GAMEPLAY
         self.is_drawn = False
         self.level = 1
@@ -29,7 +28,7 @@ class LevelTransition(State):
             "Press any key to continue",
         ]
 
-    def get_event(self, e) -> None:
+    def handle_events(self, e) -> None:
         if e.type == pg.QUIT:
             self.quit = True
         elif e.type == pg.KEYUP:
@@ -49,14 +48,14 @@ class LevelTransition(State):
         dark.set_alpha(100)
         surface.blit(dark, (0, 0))
 
-    def render(self, game_screen: Surface) -> None:
+    def render(self, game_surface: Surface) -> None:
         if not self.is_drawn:
             self.is_drawn = True
-            self.render_dark_overlay(game_screen)
-            self.blit_text_center(game_screen, "SUCCESS", 50)
+            self.render_dark_overlay(game_surface)
+            self.blit_text_center(game_surface, "SUCCESS", 50)
             for index, text in enumerate(self.stats_text):
                 self.blit_text_center(
-                    game_screen,
+                    game_surface,
                     text,
-                    self.get_screen_center(game_screen)[1] - 10 + (index * 20),
+                    82 + (index * 20),
                 )

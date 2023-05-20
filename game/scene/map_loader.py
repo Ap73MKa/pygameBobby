@@ -1,7 +1,6 @@
-from pygame import Surface, Vector2
+from pygame import Surface
 from pygame.image import load
 from pygame.sprite import Group
-from pytmx import load_pygame
 
 from game.misc import Config, PathManager
 from game.objects import Water, Tile, Trap, Trigger, Carrot

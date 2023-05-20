@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from pygame import image
 from pygame.surface import Surface
 
@@ -19,7 +17,7 @@ class SpriteSheet:
     @staticmethod
     def __get_all_frames(img: Surface, x, y) -> tuple:
         if not (x and y):
-            raise Exception("sprite_size не может быть равен 0")
+            raise Exception("sprite_size can not be equal 0")
 
         frames = []
         for _y in range(img.get_height() // y):

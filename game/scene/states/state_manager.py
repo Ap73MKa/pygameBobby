@@ -1,4 +1,5 @@
 from pygame import Surface
+from pygame.event import Event
 
 from .gameplay import Gameplay
 from .level_transition import LevelTransition
@@ -18,22 +19,22 @@ class StateManager:
         self._running = True
         self.state = self.stages[GameState.MENU]
 
-    def is_running(self):
-        return not self.state.quit
-
-    def check_state(self):
+    def __check_state(self):
         if self.state.done:
             persistent = self.state.persist
             self.state.done = False
             self.state = self.stages[self.state.next_state]
             self.state.startup(persistent)
 
-    def render(self, game_screen: Surface):
-        self.state.render(game_screen)
+    def is_running(self):
+        return not self.state.quit
 
-    def get_event(self, event):
-        self.state.get_event(event)
+    def handle_events(self, events: list[Event]) -> None:
+        self.state.handle_events(events)
 
-    def update(self, delta: float):
-        self.check_state()
+    def update(self, delta: float) -> None:
+        self.__check_state()
         self.state.update(delta)
+
+    def render(self, game_screen: Surface) -> None:
+        self.state.render(game_screen)

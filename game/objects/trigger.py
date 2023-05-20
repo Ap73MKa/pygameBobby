@@ -1,7 +1,7 @@
 from pygame.sprite import Group, Sprite
 
 from game.misc import PathManager, SpriteSheet
-from game.scene.sound_manager import SoundManager
+from game.misc.sound_manager import SoundManager
 
 
 class Trigger(Sprite):

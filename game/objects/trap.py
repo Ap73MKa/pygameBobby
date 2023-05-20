@@ -2,7 +2,7 @@ from pygame.image import load
 from pygame.sprite import Group, Sprite
 
 from game.misc import PathManager
-from game.scene.sound_manager import SoundManager
+from game.misc.sound_manager import SoundManager
 
 
 activated_image = load(PathManager.get("assets/graphics/objects/trap_activated.png"))

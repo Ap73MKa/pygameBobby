@@ -3,7 +3,7 @@ import pygame as pg
 from pygame import Color, Surface, Rect
 from pygame.image import load
 
-from game.misc import Config, PathManager, FontManager
+from game.misc import Config, PathManager
 from .state import State
 from .stage_utils import GameState
 
@@ -11,7 +11,6 @@ from .stage_utils import GameState
 class Pause(State):
     def __init__(self) -> None:
         super().__init__()
-        self.font_manager = FontManager()
         self.bg_tile = load(PathManager.get("assets/graphics/hud/grass.png")).convert()
         self.center = (Config.WIDTH // 2, Config.HEIGHT // 2)
         self.active_index = 0
@@ -44,7 +43,7 @@ class Pause(State):
             self.active_index = len(self.options) - 1
         self.active_index %= len(self.options)
 
-    def get_event(self, e) -> None:
+    def handle_events(self, e) -> None:
         if e.type == pg.QUIT:
             self.quit = True
         elif e.type == pg.KEYUP:
@@ -73,15 +72,15 @@ class Pause(State):
         center = (self.center[0], self.center[1] - 30 + (index * 20))
         return text.get_rect(center=center)
 
-    def render(self, game_screen: Surface) -> None:
+    def render(self, game_surface: Surface) -> None:
         if not self.is_drawn_once:
             self.is_drawn_once = True
             dark = Surface((Config.WIDTH, Config.HEIGHT))
             dark.fill((0, 0, 0))
             dark.set_alpha(100)
-            game_screen.blit(dark, (0, 0))
+            game_surface.blit(dark, (0, 0))
 
         for index in range(len(self.options)):
             self.render_menu_text(
-                game_screen, index, game_screen.get_rect().centery - 30
+                game_surface, index, game_surface.get_rect().centery - 30
             )

@@ -1,27 +1,22 @@
 from pygame import Surface
-from pygame.display import get_surface
 from pygame.event import Event
 
+from game.misc import FontManager, SoundManager
 from .stage_utils import GameState
-from ..sound_manager import SoundManager
 
 
 class State:
-    def __init__(self) -> None:
+    def __init__(self):
         self.sound_manager = SoundManager()
-        self.done = self.quit = False
+        self.font_manager = FontManager()
         self.next_state: GameState | None = None
-        self.screen_rect = get_surface().get_rect()
+        self.done = self.quit = False
         self.persist: dict = {}
 
     def startup(self, persistent: dict) -> None:
         self.persist = persistent
 
-    @staticmethod
-    def get_screen_center(surface: Surface) -> tuple[int, int]:
-        return surface.get_rect().center
-
-    def get_event(self, e: Event) -> None:
+    def handle_events(self, events: list[Event]) -> None:
         pass
 
     def update(self, delta: float) -> None:

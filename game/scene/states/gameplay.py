@@ -135,7 +135,7 @@ class Gameplay(State):
             trigger: Trigger = self.level_triggers_group.sprites()[0]
             trigger.activate()
 
-    def get_event(self, e) -> None:
+    def handle_events(self, e) -> None:
         self.quit = e.type == QUIT
         if e.type == KEYUP and e.key == K_ESCAPE:
             self.next_state = GameState.PAUSE

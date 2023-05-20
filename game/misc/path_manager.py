@@ -14,8 +14,8 @@ class PathManager(ABC):
     ROOT: Final = get_root()
 
     @classmethod
-    def get(cls, path: str) -> Path:
-        return cls.ROOT.joinpath(path)
+    def get(cls, path: str) -> str:
+        return str(cls.ROOT.joinpath(path))
 
     @classmethod
     def get_folder(cls, path: str) -> list[Path]:
