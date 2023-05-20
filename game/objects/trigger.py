@@ -7,7 +7,9 @@ from game.scene.sound_manager import SoundManager
 class Trigger(Sprite):
     def __init__(self, pos: tuple[int, int], groups: list[Group]):
         super().__init__(*groups)
-        self.sprites = SpriteSheet(str(PathManager.get("assets/graphics/objects/exit_trigger.png")), (16, 16))[0]
+        self.sprites = SpriteSheet(
+            str(PathManager.get("assets/graphics/objects/exit_trigger.png")), (16, 16)
+        )[0]
         self.sound_manager = SoundManager()
         self.frame = 0.0
         self.frame_speed = 15
@@ -19,7 +21,7 @@ class Trigger(Sprite):
         if self.is_activated:
             return
         self.is_activated = True
-        self.sound_manager.play_sound('open_exit')
+        self.sound_manager.play_sound("open_exit")
 
     def deactivate(self):
         self.is_activated = False

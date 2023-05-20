@@ -54,7 +54,9 @@ class Gameplay(State):
         self.visible_sprites.remove(self.player)
         self.found_carrots = 0
         self.is_player_died = False
-        self.player = Player(self.start_pos, self.visible_sprites, self.collision_sprites)
+        self.player = Player(
+            self.start_pos, self.visible_sprites, self.collision_sprites
+        )
         self.ui.set_start_time(get_ticks())
 
     def reset_objects(self):

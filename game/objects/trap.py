@@ -6,7 +6,9 @@ from game.scene.sound_manager import SoundManager
 
 
 activated_image = load(PathManager.get("assets/graphics/objects/trap_activated.png"))
-deactivated_image = load(PathManager.get("assets/graphics/objects/trap_deactivated.png"))
+deactivated_image = load(
+    PathManager.get("assets/graphics/objects/trap_deactivated.png")
+)
 
 
 class Trap(Sprite):
@@ -24,4 +26,4 @@ class Trap(Sprite):
     def activate_trap(self) -> None:
         self.is_activated = True
         self.image = activated_image
-        self.sound_manager.play_sound('open_trap')
+        self.sound_manager.play_sound("open_trap")

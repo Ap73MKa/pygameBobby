@@ -1,6 +1,5 @@
 pygame~=2.4.0
 PyTMX~=3.31
-numpy~=1.24.3
 
 black==23.3.0
 pylint==2.17.4
