@@ -13,6 +13,8 @@ the possibilities of Pygame and develop game applications.
 
 # Preview
 
+https://github.com/Ap73MKa/pygameBobby/assets/45181349/8fe5b274-0e17-4f16-9797-5518a9bc932e
+
 # Project setup
 
 1. Install [Python 3.10+](https://www.python.org/downloads/)
