@@ -16,7 +16,7 @@ class State:
     def startup(self, persistent: dict) -> None:
         self.persist = persistent
 
-    def handle_event(self, events: list[Event]) -> None:
+    def handle_event(self, event: Event) -> None:
         pass
 
     def update(self, delta: float) -> None:

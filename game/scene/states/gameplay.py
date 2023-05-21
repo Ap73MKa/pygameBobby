@@ -7,7 +7,7 @@ from pygame.event import Event
 
 from game.misc import Config, PathManager
 from game.objects import Player, Trigger
-from game.scene import UI, CameraGroup
+from game.scene import Interface, CameraGroup
 from game.scene.map_loader import MapLoader
 from . import State, GameState
 
@@ -30,7 +30,7 @@ class Gameplay(State):
         self.level_triggers_group = Group()
         self.carrots_group = Group()
         self.traps_group = Group()
-        self.ui = UI()
+        self.ui = Interface()
 
         self.load_data(self.get_tmx_data())
 
@@ -143,7 +143,7 @@ class Gameplay(State):
     def update(self, delta: float) -> None:
         self.check_collide()
         self.visible_sprites.update(delta)
-        self.visible_sprites.update_camera_pos(self.player, self.corner, delta)
+        self.visible_sprites.custom_update(self.player, self.corner, delta)
         self.check_end()
         self.ui.update(self.carrots_count - self.found_carrots)
 

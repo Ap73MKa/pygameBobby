@@ -11,11 +11,11 @@ class CameraGroup(Group):
         super().__init__()
         self.size = Vector2((Config.WIDTH, Config.HEIGHT))
         self.camera = self.size / 2
-        self.camera_speed = 5
+        self.camera_speed = 3 * 100
         self.offset = Vector2()
         self.render_texture = Surface(self.size)
 
-    def __is_visible(self, sprite) -> bool:
+    def _is_visible(self, sprite) -> bool:
         return (
             self.size.y + self.offset.y
             > sprite.rect.y
@@ -25,23 +25,33 @@ class CameraGroup(Group):
             > -Config.TITLE_SIZE - self.offset.x
         )
 
-    def __get_offset_sprites(self):
-        return (
+    def _get_offset_sprites(self) -> tuple:
+        return tuple(
             (sprite, sprite.rect.topleft - self.offset)
             for sprite in self.sprites()
-            if self.__is_visible(sprite)
+            if self._is_visible(sprite)
         )
 
-    def update_camera_pos(self, player: Player, corner: Vector2, delta: float):
+    def _update_camera_pos(self, player: Player, delta: float) -> None:
         heading = player.rect.center - self.camera
-        self.camera += heading * self.camera_speed * delta
+        distance = heading.length()
+        if distance > 0:
+            speed = min(self.camera_speed * delta, distance)
+            heading.scale_to_length(speed)
+            self.camera += heading
+
+    def _clamp_offset(self, corner: Vector2) -> None:
         self.offset = self.camera - (self.size / 2)
         self.offset.x = max(0, min(int(self.offset.x), corner.x - self.size.x))
         self.offset.y = max(0, min(int(self.offset.y), corner.y - self.size.y))
         self.offset = round(self.offset)
 
-    def custom_render(self, surface: Surface):
+    def custom_update(self, player: Player, corner: Vector2, delta: float) -> None:
+        self._update_camera_pos(player, delta)
+        self._clamp_offset(corner)
+
+    def custom_render(self, surface: Surface) -> None:
         self.render_texture.fill((0, 0, 0))
-        for sprite, offset_pos in self.__get_offset_sprites():
+        for sprite, offset_pos in self._get_offset_sprites():
             self.render_texture.blit(sprite.image, offset_pos)
         surface.blit(self.render_texture, (0, 0))

@@ -44,7 +44,7 @@ class Game:
 
     def run(self) -> None:
         while self._running:
-            delta = self.clock.tick_busy_loop(Config.FPS) / 1000.0
+            delta = self.clock.tick(Config.FPS) / 1000.0
             self.handle_events()
             self.update(delta)
             self.render()
