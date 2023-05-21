@@ -1,9 +1,9 @@
 import pygame as pg
+from pygame.event import Event
 from pygame.surface import Surface
 
 from game.misc import Config
-from .stage_utils import GameState
-from .state import State
+from . import State, GameState
 
 
 class LevelTransition(State):
@@ -28,10 +28,10 @@ class LevelTransition(State):
             "Press any key to continue",
         ]
 
-    def handle_events(self, e) -> None:
-        if e.type == pg.QUIT:
+    def handle_event(self, event: Event) -> None:
+        if event.type == pg.QUIT:
             self.quit = True
-        elif e.type == pg.KEYUP:
+        elif event.type == pg.KEYUP:
             if self.level > Config.MAX_LEVEL:
                 self.next_state = GameState.MENU
             else:

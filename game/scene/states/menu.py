@@ -1,13 +1,12 @@
+from pytmx import load_pygame
 from pygame import Color, QUIT, KEYUP, K_UP, K_DOWN, K_RIGHT, K_LEFT, K_RETURN, Surface
+from pygame.event import Event
 from pygame.image import load
 from pygame.sprite import Group
-from pytmx import load_pygame
 
 from game.misc import PathManager, Config
 from game.objects import Tile, Water
-from .state import State
-from .stage_utils import GameState
-
+from . import State, GameState
 
 
 class Menu(State):
@@ -69,19 +68,19 @@ class Menu(State):
             self.level_index = Config.MAX_LEVEL
         self.options[1] = f"Choose level <{self.level_index}>"
 
-    def handle_events(self, e) -> None:
-        if e.type == QUIT:
+    def handle_event(self, event: Event) -> None:
+        if event.type == QUIT:
             self.quit = True
-        elif e.type == KEYUP:
-            if e.key == K_UP:
+        elif event.type == KEYUP:
+            if event.key == K_UP:
                 self.handle_option_index(-1)
-            elif e.key == K_DOWN:
+            elif event.key == K_DOWN:
                 self.handle_option_index(1)
-            elif e.key == K_RIGHT and self.active_index == 1:
+            elif event.key == K_RIGHT and self.active_index == 1:
                 self.handle_level_index(1)
-            elif e.key == K_LEFT and self.active_index == 1:
+            elif event.key == K_LEFT and self.active_index == 1:
                 self.handle_level_index(-1)
-            elif e.key == K_RETURN:
+            elif event.key == K_RETURN:
                 self.sound_manager.play_sound("menu_sound")
                 self.handle_action()
 

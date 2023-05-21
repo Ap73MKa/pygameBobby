@@ -3,14 +3,13 @@ from pytmx.util_pygame import load_pygame
 from pygame import Surface, Vector2, KEYUP, K_ESCAPE, QUIT
 from pygame.sprite import Group
 from pygame.time import get_ticks
+from pygame.event import Event
 
 from game.misc import Config, PathManager
 from game.objects import Player, Trigger
+from game.scene import UI, CameraGroup
 from game.scene.map_loader import MapLoader
-from game.scene.ui import UI
-from game.scene.camera import CameraGroup
-from game.scene.states.stage_utils import GameState
-from game.scene.states.state import State
+from . import State, GameState
 
 
 class Gameplay(State):
@@ -135,9 +134,9 @@ class Gameplay(State):
             trigger: Trigger = self.level_triggers_group.sprites()[0]
             trigger.activate()
 
-    def handle_events(self, e) -> None:
-        self.quit = e.type == QUIT
-        if e.type == KEYUP and e.key == K_ESCAPE:
+    def handle_event(self, event: Event) -> None:
+        self.quit = event.type == QUIT
+        if event.type == KEYUP and event.key == K_ESCAPE:
             self.next_state = GameState.PAUSE
             self.done = True
 

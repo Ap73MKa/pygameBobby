@@ -2,7 +2,7 @@ from pygame import Surface
 from pygame.event import Event
 
 from game.misc import FontManager, SoundManager
-from .stage_utils import GameState
+from . import GameState
 
 
 class State:
@@ -16,7 +16,7 @@ class State:
     def startup(self, persistent: dict) -> None:
         self.persist = persistent
 
-    def handle_events(self, events: list[Event]) -> None:
+    def handle_event(self, events: list[Event]) -> None:
         pass
 
     def update(self, delta: float) -> None:

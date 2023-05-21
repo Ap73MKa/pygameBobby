@@ -1,10 +1,9 @@
-from pygame import Surface
-from pygame.image import load
+from pygame import Surface, image
 from pygame.sprite import Group
 
 from game.misc import Config, PathManager
 from game.objects import Water, Tile, Trap, Trigger, Carrot
-from .camera import CameraGroup
+from . import CameraGroup
 
 
 class MapLoader:
@@ -40,7 +39,7 @@ class MapLoader:
         if hasattr(layer, "data"):
             for x, y, surf in layer.tiles():
                 pos = (x * Config.TITLE_SIZE, y * Config.TITLE_SIZE)
-                surf = load(
+                surf = image.load(
                     PathManager.get("assets/graphics/objects/spawn_trigger.png")
                 )
                 Tile(pos, surf, [self.visible_sprites])

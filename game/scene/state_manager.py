@@ -1,11 +1,7 @@
 from pygame import Surface
 from pygame.event import Event
 
-from .gameplay import Gameplay
-from .level_transition import LevelTransition
-from .menu import Menu
-from .pause import Pause
-from .state import GameState
+from game.scene.states import Menu, Pause, GameState, Gameplay, LevelTransition
 
 
 class StateManager:
@@ -29,8 +25,8 @@ class StateManager:
     def is_running(self):
         return not self.state.quit
 
-    def handle_events(self, events: list[Event]) -> None:
-        self.state.handle_events(events)
+    def handle_event(self, event: Event) -> None:
+        self.state.handle_event(event)
 
     def update(self, delta: float) -> None:
         self.__check_state()

@@ -19,6 +19,7 @@ class Game:
         self.screen = None
         self.clock = Clock()
         self.initialize()
+        self.manager = StateManager()
 
     def initialize(self) -> None:
         init()
@@ -30,7 +31,7 @@ class Game:
     def handle_events(self) -> None:
         for event in events():
             self._running = event.type == QUIT
-            self.manager.handle_events(event)
+            self.manager.handle_event(event)
 
     def update(self, delta: float) -> None:
         self._running = self.manager.is_running()

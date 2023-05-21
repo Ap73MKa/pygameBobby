@@ -1,11 +1,9 @@
-import pygame as pg
-
-from pygame import Color, Surface, Rect
+from pygame import Color, Surface, Rect, QUIT, KEYUP, K_UP, K_DOWN, K_RETURN
+from pygame.event import Event
 from pygame.image import load
 
 from game.misc import Config, PathManager
-from .state import State
-from .stage_utils import GameState
+from . import State, GameState
 
 
 class Pause(State):
@@ -43,18 +41,6 @@ class Pause(State):
             self.active_index = len(self.options) - 1
         self.active_index %= len(self.options)
 
-    def handle_events(self, e) -> None:
-        if e.type == pg.QUIT:
-            self.quit = True
-        elif e.type == pg.KEYUP:
-            if e.key == pg.K_UP:
-                self.handle_option_index(-1)
-            elif e.key == pg.K_DOWN:
-                self.handle_option_index(1)
-            elif e.key == pg.K_RETURN:
-                self.sound_manager.play_sound("menu_sound")
-                self.handle_action()
-
     def render_menu_text(
         self, surface: Surface, index, y_pos: int, color: Color = (255, 255, 255)
     ):
@@ -71,6 +57,18 @@ class Pause(State):
     def get_text_position(self, text, index) -> Rect:
         center = (self.center[0], self.center[1] - 30 + (index * 20))
         return text.get_rect(center=center)
+
+    def handle_event(self, event: Event) -> None:
+        if event.type == QUIT:
+            self.quit = True
+        elif event.type == KEYUP:
+            if event.key == K_UP:
+                self.handle_option_index(-1)
+            elif event.key == K_DOWN:
+                self.handle_option_index(1)
+            elif event.key == K_RETURN:
+                self.sound_manager.play_sound("menu_sound")
+                self.handle_action()
 
     def render(self, game_surface: Surface) -> None:
         if not self.is_drawn_once:
