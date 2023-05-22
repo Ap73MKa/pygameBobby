@@ -4,7 +4,7 @@ from pygame import Vector2, K_UP, K_w, K_DOWN, K_s, K_LEFT, K_RIGHT, K_a, K_d
 from pygame.key import get_pressed
 from pygame.sprite import Sprite, Group
 
-from game.misc import Config, PathManager, SpriteSheet
+from game.misc import Config, PathManager, SpriteSheet, Animation
 
 
 class AnimEnum(IntEnum):
@@ -34,16 +34,12 @@ class Player(Sprite):
     def __init__(self, pos, group: Group, collision_group: Group):
         super().__init__(group)
         # animation
-        self.frame = 0
-        self.frame_speed = 10
+        image_path = str(PathManager.get("assets/graphics/player/walk.png"))
+        self.animation = Animation(SpriteSheet(image_path, (16, 17)), 10)
+        image_path = str(PathManager.get("assets/graphics/player/idle.png"))
+        self.idle_animation = Animation(SpriteSheet(image_path, (16, 17)), 10)
         self.anim_state: AnimEnum = AnimEnum.DOWN
-        self.sprites = SpriteSheet(
-            str(PathManager.get("assets/graphics/player/walk.png")), (16, 17)
-        )
-        self.idle_sprites = SpriteSheet(
-            str(PathManager.get("assets/graphics/player/idle.png")), (16, 17)
-        )
-        self.image = self.sprites[self.anim_state][self.frame]
+        self.image = self.animation.get_current_image(self.anim_state)
 
         # movement
         self.image_offset = Vector2(*self.image.get_size()) - Vector2(Config.TITLE_SIZE)
@@ -86,7 +82,8 @@ class Player(Sprite):
     def move(self, delta: float):
         if not self.direction:
             return
-        if self.pos == self.target_pos:
+        if self.pos.distance_to(self.target_pos) <= self.move_speed * delta:
+            self.pos = self.target_pos.copy()
             self.direction *= 0
             self.step_count += 1
         else:
@@ -99,17 +96,16 @@ class Player(Sprite):
         self.rect.topleft = round(self.pos - self.image_offset)
 
     def animate(self, delta):
-        animation = self.sprites[self.anim_state]
+        animation = self.animation
         if self.is_inactive and self.anim_state != AnimEnum.DYING:
-            animation = self.idle_sprites[self.anim_state]
-        self.frame += self.frame_speed * delta
-        self.frame = self.frame % len(animation)
-        self.image = animation[int(self.frame)]
+            animation = self.idle_animation
+        animation.animate(delta)
+        self.image = animation.get_current_image(self.anim_state)
 
     def die(self):
         self.anim_state = AnimEnum.DYING
         if not self.is_dying:
-            self.frame = 0
+            self.animation.reset_frame()
             self.is_dying = True
 
     def collision(self):
