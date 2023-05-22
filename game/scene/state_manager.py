@@ -6,31 +6,31 @@ from game.scene.states import Menu, Pause, GameState, Gameplay, LevelTransition
 
 class StateManager:
     def __init__(self):
-        self.stages = {
+        self.states = {
             GameState.MENU: Menu(),
             GameState.GAMEPLAY: Gameplay(),
             GameState.PAUSE: Pause(),
             GameState.TRANSITION: LevelTransition(),
         }
         self._running = True
-        self.state = self.stages[GameState.MENU]
+        self.current_state = self.states[GameState.MENU]
 
-    def __check_state(self):
-        if self.state.done:
-            persistent = self.state.persist
-            self.state.done = False
-            self.state = self.stages[self.state.next_state]
-            self.state.startup(persistent)
+    def _swap_state(self):
+        persistent = self.current_state.persist
+        self.current_state.done = False
+        self.current_state = self.states[self.current_state.next_state]
+        self.current_state.startup(persistent)
 
     def is_running(self):
-        return not self.state.quit
+        return not self.current_state.quit
 
     def handle_event(self, event: Event) -> None:
-        self.state.handle_event(event)
+        self.current_state.handle_event(event)
 
     def update(self, delta: float) -> None:
-        self.__check_state()
-        self.state.update(delta)
+        if self.current_state.done:
+            self._swap_state()
+        self.current_state.update(delta)
 
     def render(self, game_screen: Surface) -> None:
-        self.state.render(game_screen)
+        self.current_state.render(game_screen)
