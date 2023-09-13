@@ -15,13 +15,13 @@ class StateManager:
         self._running = True
         self.current_state = self.states[GameState.MENU]
 
-    def _swap_state(self):
+    def _swap_state(self) -> None:
         persistent = self.current_state.persist
         self.current_state.done = False
         self.current_state = self.states[self.current_state.next_state]
         self.current_state.startup(persistent)
 
-    def is_running(self):
+    def is_running(self) -> bool:
         return not self.current_state.quit
 
     def handle_event(self, event: Event) -> None:

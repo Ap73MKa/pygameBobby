@@ -7,6 +7,8 @@ from src.objects import Carrot, Tile, Trap, Trigger, Water
 
 from . import CameraGroup
 
+# todo type hint, dict function mapping
+
 
 class MapLoader:
     def __init__(self):

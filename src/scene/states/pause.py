@@ -17,31 +17,34 @@ class Pause(State):
         self.options = ["Continue", "Reload level", "Back to menu", "Exit"]
         self.is_drawn_once = False
         self.persist = {}
+        self.actions = {
+            0: (GameState.GAMEPLAY, {"reload": False}),
+            1: (GameState.GAMEPLAY, {"reload": True}),
+            2: (GameState.MENU, {}),
+            3: (None, None),
+        }
+        self.key_actions = {
+            K_UP: lambda: self.handle_option_index(-1),
+            K_DOWN: lambda: self.handle_option_index(1),
+            K_RETURN: lambda: self.handle_action(),
+        }
 
     def startup(self, persistent: dict) -> None:
         self.active_index = 0
         self.is_drawn_once = False
 
     def handle_action(self) -> None:
-        if self.active_index == 0:
-            self.persist = {"reload": False}
-            self.next_state = GameState.GAMEPLAY
-            self.done = True
-        if self.active_index == 1:
-            self.next_state = GameState.GAMEPLAY
-            self.persist = {"reload": True}
-            self.done = True
-        if self.active_index == 2:
-            self.next_state = GameState.MENU
-            self.done = True
-        elif self.active_index == 3:
+        self.sound_manager.play_sound("menu_sound")
+        next_state, persist = self.actions[self.active_index]
+        if next_state is None:
             self.quit = True
+            return
+        self.next_state = next_state
+        self.persist = persist
+        self.done = True
 
-    def handle_option_index(self, move: int = 0):
-        self.active_index += move
-        if self.active_index < 0:
-            self.active_index = len(self.options) - 1
-        self.active_index %= len(self.options)
+    def handle_option_index(self, move: int = 0) -> None:
+        self.active_index = (self.active_index + move) % len(self.options)
 
     def render_menu_text(
         self, surface: Surface, index, y_pos: int, color: Color = (255, 255, 255)
@@ -64,21 +67,20 @@ class Pause(State):
         if event.type == QUIT:
             self.quit = True
         elif event.type == KEYUP:
-            if event.key == K_UP:
-                self.handle_option_index(-1)
-            elif event.key == K_DOWN:
-                self.handle_option_index(1)
-            elif event.key == K_RETURN:
-                self.sound_manager.play_sound("menu_sound")
-                self.handle_action()
+            if action := self.key_actions.get(event.key):
+                action()
+
+    @staticmethod
+    def draw_black_surface(game_surface: Surface) -> None:
+        dark = Surface((configure.WIDTH, configure.HEIGHT))
+        dark.fill((0, 0, 0))
+        dark.set_alpha(100)
+        game_surface.blit(dark, (0, 0))
 
     def render(self, game_surface: Surface) -> None:
         if not self.is_drawn_once:
             self.is_drawn_once = True
-            dark = Surface((configure.WIDTH, configure.HEIGHT))
-            dark.fill((0, 0, 0))
-            dark.set_alpha(100)
-            game_surface.blit(dark, (0, 0))
+            self.draw_black_surface(game_surface)
 
         for index in range(len(self.options)):
             self.render_menu_text(

@@ -15,10 +15,11 @@ class CarrotCounter:
         self.count = count
 
     def render(self, surface: Surface) -> None:
-        if self.count > 0:
-            self.font_manager.render_text(
-                surface,
-                str(self.count),
-                (configure.WIDTH - configure.TITLE_SIZE * 2, 2),
-            )
-            surface.blit(self.carrot_img, (configure.WIDTH - configure.TITLE_SIZE, 2))
+        if self.count == 0:
+            return
+        self.font_manager.render_text(
+            surface,
+            str(self.count),
+            (configure.WIDTH - configure.TITLE_SIZE * 2, 2),
+        )
+        surface.blit(self.carrot_img, (configure.WIDTH - configure.TITLE_SIZE, 2))

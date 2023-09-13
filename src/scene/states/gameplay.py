@@ -1,3 +1,5 @@
+from typing import Protocol
+
 from pygame import K_ESCAPE, KEYUP, QUIT, Surface, Vector2
 from pygame.event import Event
 from pygame.sprite import Group
@@ -33,7 +35,17 @@ class Gameplay(State):
         self.traps_group = Group()
         self.ui = Interface()
 
+        self.commands: dict[str, CommandProtocol] = self.get_commands()
+
         self.load_data(self.get_tmx_data())
+
+    @staticmethod
+    def get_commands() -> dict:
+        return {
+            "carrot": CarrotCommand(),
+            "level_trigger": LevelTriggerCommand(),
+            "trap": TrapCommand(),
+        }
 
     def startup(self, persistent: dict) -> None:
         self.next_state = GameState.TRANSITION
@@ -67,6 +79,15 @@ class Gameplay(State):
         for level_trigger in self.level_triggers_group:
             level_trigger.deactivate()
 
+    def complete_level(self) -> None:
+        self.persist = {
+            "level": self.index_map + 1,
+            "time": self.ui.get_time(),
+            "steps": self.player.get_step_count(),
+        }
+        self.sound_manager.play_sound("exit_sound")
+        self.done = True
+
     def load_data(self, tmx_data: TiledMap) -> None:
         map_loader = MapLoader()
         self.corner = Vector2(tmx_data.width, tmx_data.height) * configure.TITLE_SIZE
@@ -85,40 +106,9 @@ class Gameplay(State):
         self.found_carrots = 0
         self.ui.reset()
 
-    def check_level_trigger(self):
-        level_trigger: Trigger = self.level_triggers_group.sprites()[0]
-        if (
-            level_trigger.rect.topleft == self.player.pos
-            and self.carrots_count == self.found_carrots
-        ):
-            self.persist = {
-                "level": self.index_map + 1,
-                "time": self.ui.get_time(),
-                "steps": self.player.get_step_count(),
-            }
-            self.sound_manager.play_sound("exit_sound")
-            self.done = True
-
-    def check_carrot_trigger(self):
-        for carrot in self.carrots_group:
-            if carrot.rect.topleft == self.player.pos and not carrot.activated:
-                self.found_carrots += 1
-                self.sound_manager.play_sound("carrot_pickup")
-                carrot.activate()
-
-    def check_trap_trigger(self):
-        for trap in self.traps_group:
-            if trap.rect.topleft == self.player.pos:
-                trap.is_touched = True
-                if trap.is_activated:
-                    self.timeout_death()
-            elif trap.is_touched and not trap.is_activated:
-                trap.activate_trap()
-
     def check_collide(self) -> None:
-        self.check_level_trigger()
-        self.check_carrot_trigger()
-        self.check_trap_trigger()
+        for command in self.commands.values():
+            command.execute(self)
 
     def timeout_death(self) -> None:
         self.player.die()
@@ -151,3 +141,37 @@ class Gameplay(State):
     def render(self, game_surface: Surface) -> None:
         self.visible_sprites.custom_render(game_surface)
         self.ui.render(game_surface)
+
+
+class CommandProtocol(Protocol):
+    def execute(self, gameplay: Gameplay, *args, **kwargs) -> None:
+        ...
+
+
+class CarrotCommand(CommandProtocol):
+    def execute(self, scene: Gameplay, *args, **kwargs) -> None:
+        for carrot in scene.carrots_group:
+            is_touched = carrot.rect.topleft == scene.player.pos
+            if is_touched and not carrot.activated:
+                scene.found_carrots += 1
+                scene.sound_manager.play_sound("carrot_pickup")
+                carrot.activate()
+
+
+class LevelTriggerCommand(CommandProtocol):
+    def execute(self, scene: Gameplay, *args, **kwargs) -> None:
+        level_trigger: Trigger = scene.level_triggers_group.sprites()[0]
+        is_touched = level_trigger.rect.topleft == scene.player.pos
+        if is_touched and scene.carrots_count == scene.found_carrots:
+            scene.complete_level()
+
+
+class TrapCommand(CommandProtocol):
+    def execute(self, scene: Gameplay, *args, **kwargs) -> None:
+        for trap in scene.traps_group:
+            if trap.rect.topleft == scene.player.pos:
+                trap.is_touched = True
+                if trap.is_activated:
+                    scene.timeout_death()
+            elif trap.is_touched and not trap.is_activated:
+                trap.activate_trap()

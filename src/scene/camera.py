@@ -36,8 +36,7 @@ class CameraGroup(Group):
 
     def _update_camera_pos(self, player: Player, delta: float) -> None:
         heading = player.rect.center - self.camera
-        distance = heading.length()
-        if distance > 0:
+        if (distance := heading.length()) > 0:
             speed = min(self.camera_speed * delta, distance)
             heading.scale_to_length(speed)
             self.camera += heading

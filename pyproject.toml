@@ -15,6 +15,10 @@ requires-python = ">=3.10,<3.13"
 readme = "README.md"
 license = {text = "MIT"}
 
+[tool.pdm.scripts]
+lint = "ruff check src"
+format = "black src"
+
 [tool.pdm.dev-dependencies]
 dev = [
     "black>=23.7.0",

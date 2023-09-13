@@ -43,7 +43,8 @@ class LevelTransition(State):
         pos = self.font_manager.get_text_center_x_pos(surface, text, y_pos)
         self.font_manager.render_text(surface, text, pos)
 
-    def render_dark_overlay(self, surface: Surface):
+    @staticmethod
+    def render_dark_overlay(surface: Surface):
         dark = Surface((configure.WIDTH, configure.HEIGHT))
         dark.fill((0, 0, 0))
         dark.set_alpha(100)
